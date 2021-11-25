@@ -1,8 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-}
 
+}
+apply plugin: 'kotlin-kapt'
 android {
     compileSdk 31
 
@@ -43,9 +44,7 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.4.0'
     implementation("androidx.room:room-runtime:$roomVersion")
-    annotationProcessor("androidx.room:room-compiler:$roomVersion")
-
-
+    kapt "androidx.room:room-compiler:$roomVersion"
 
 
     // optional - Kotlin Extensions and Coroutines support for Room

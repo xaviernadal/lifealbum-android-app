@@ -11,18 +11,26 @@ import xaviernadalreales.com.lifealbum.dao.NoteDao
 @Database(entities = [Note::class], version = 1, exportSchema = false)
 abstract class NotesDatabase : RoomDatabase() {
 
-    private var notesDatabase: NotesDatabase? = null
 
-    @Synchronized
-    fun getDatabase(context: Context): NotesDatabase? {
-        if (notesDatabase == null) {
-            notesDatabase = Room.databaseBuilder(
-                context,
-                NotesDatabase::class.java,
-                "notes_db"
-            ).build()
+    companion object {
+
+        private var notesDatabase: NotesDatabase? = null
+
+        @Synchronized
+        fun getDatabase(context: Context): NotesDatabase? {
+            if (notesDatabase == null) {
+                notesDatabase = Room.databaseBuilder(
+                    context,
+                    NotesDatabase::class.java,
+                    "notes_db"
+                ).build()
+            }
+            return notesDatabase
         }
-        return notesDatabase
+
     }
+
     abstract fun noteDao(): NoteDao
+
+
 }
