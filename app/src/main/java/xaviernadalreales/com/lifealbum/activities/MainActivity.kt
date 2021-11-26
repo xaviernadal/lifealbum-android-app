@@ -34,14 +34,17 @@ class MainActivity : AppCompatActivity() {
 
         val resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                //I had a lot of trouble here since I save the notes by pressing the back button, and the
+                //resultCode for that is 0 (cancelled), but the RESULT_OK is -1.
                 if (result.resultCode == Activity.RESULT_OK) {
-                    Log.d("claro pero aqui qentre ono","claro claro")
                     val intent = result.data
                     getNotes()
                 }
             }
         imageAddElement.setOnClickListener {
             resultLauncher.launch(Intent(applicationContext, CreateNoteActivity::class.java))
+            Log.d("claro pero aqui qentre ono","claro claro4")
+
         }
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
         recyclerViewNotes.layoutManager =
