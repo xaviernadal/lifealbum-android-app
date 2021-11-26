@@ -1,43 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layoutNote"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="12dp"
     android:layout_marginTop="12dp"
     android:background="@drawable/background_note"
-    android:orientation="vertical"
     tools:ignore="SmallSp">
 
-    <!-- TODO: I could do the rounded corners with a Card or the rounded_background-->
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:cardCornerRadius="10dp">
-
-        <ImageView
-            android:id="@+id/imageNote"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/app_name"
-            android:scaleType="centerCrop"
-            android:visibility="gone" />
-    </androidx.cardview.widget.CardView>
-
-    <!-- <ImageView
+    <ImageView
         android:id="@+id/imageNote"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:contentDescription="@string/app_name"
-        android:scaleType="centerCrop"
-        android:visibility="gone" />
-        -->
+        android:visibility="gone"
+        android:background="@drawable/round_outline"
+        android:clipToOutline="true"/>
+
+
     <TextView
         android:id="@+id/textTitle"
         android:layout_width="match_parent"
@@ -48,8 +30,8 @@
         android:fontFamily="@font/montserrat_bold"
         android:includeFontPadding="false"
         android:textColor="@color/white"
-        android:textSize="13sp" />
-
+        android:textSize="13sp"
+        />
     <TextView
         android:id="@+id/textDate"
         android:layout_width="match_parent"
@@ -60,7 +42,7 @@
         android:fontFamily="@font/montserrat_regular"
         android:includeFontPadding="false"
         android:textColor="@color/note_subtitle"
-        android:textSize="7sp" />
+        android:textSize="7sp"/>
 
 
 </LinearLayout>
