@@ -52,13 +52,6 @@ class CreateNoteActivity : AppCompatActivity() {
         note.noteText = inputNoteText.text.toString()
         note.date = date.text.toString()
 
-
-        Log.d("title", inputNoteTitle.text.toString())
-        Log.d("date", inputNoteText.text.toString())
-        Log.d("text", date.text.toString())
-        Log.d("title", note.title)
-        Log.d("date", note.date)
-        Log.d("text", note.noteText)
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
 
