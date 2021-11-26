@@ -29,7 +29,10 @@ class CreateNoteActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_note)
 
         val imageBack: ImageView = findViewById(R.id.back);
-        imageBack.setOnClickListener { saveNote(); onBackPressed() }
+        imageBack.setOnClickListener { onBackPressed() }
+
+        val imageSave: ImageView = findViewById(R.id.saveNote)
+        imageSave.setOnClickListener { saveNote(); }
 
         inputNoteTitle = findViewById(R.id.noteTitle)
         inputNoteText = findViewById(R.id.note)
