@@ -3,4 +3,6 @@
     <string name="my_lifealbum">My LifeAlbum</string>
     <string name="memories">Memories</string>
     <string name="title">Title</string>
+    <string name="colors">Colors</string>
+    <string name="choose_color">Choose color</string>
 </resources>
