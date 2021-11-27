@@ -34,7 +34,8 @@ class MainActivity : AppCompatActivity(), NotesListener {
     companion object {
         private var REQUESTCODE = "REQUEST_CODE"
     }
-    lateinit var resultLauncher : ActivityResultLauncher<Intent>
+
+    lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,17 +51,17 @@ class MainActivity : AppCompatActivity(), NotesListener {
                     if (intent != null) {
                         val requestCode: String? = intent.extras?.getString(REQUESTCODE)
                         if (requestCode != null) {
-                            getNotes(requestCode)
+                            Log.d("si o no", intent.getBooleanExtra("noteDeleted" ,false).toString())
+                            getNotes(requestCode, intent.getBooleanExtra("noteDeleted", false))
                         }
                     }
-
                 }
             }
+
         imageAddElement.setOnClickListener {
             val intent = Intent(applicationContext, CreateNoteActivity::class.java)
             intent.putExtra("ADD_NOTE", true)
             resultLauncher.launch(intent)
-
         }
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
         recyclerViewNotes.layoutManager =
@@ -68,12 +69,12 @@ class MainActivity : AppCompatActivity(), NotesListener {
 
         notesAdapter = NotesAdapter(noteList, this)
         recyclerViewNotes.adapter = notesAdapter
-        getNotes("SHOW")
+        getNotes("SHOW", false)
     }
 
 
     @SuppressLint("NotifyDataSetChanged")
-    fun getNotes(requestCode: String) {
+    fun getNotes(requestCode: String, noteDeleted: Boolean) {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
@@ -93,10 +94,15 @@ class MainActivity : AppCompatActivity(), NotesListener {
                     }
                     "UPDATE" -> {
                         noteList.removeAt(noteClickedPosition)
-                        if (notes != null) {
-                            noteList.add(noteClickedPosition, notes[noteClickedPosition])
+                        if (noteDeleted){
+                            Log.d("pero", "si")
+                            notesAdapter.notifyItemRemoved(noteClickedPosition)
+                        } else {
+                            if (notes != null) {
+                                noteList.add(noteClickedPosition, notes[noteClickedPosition])
+                                notesAdapter.notifyItemChanged(noteClickedPosition)
+                            }
                         }
-                        notesAdapter.notifyItemChanged(noteClickedPosition)
                     }
                 }
             }

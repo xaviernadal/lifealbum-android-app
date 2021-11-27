@@ -2,11 +2,13 @@ package xaviernadalreales.com.lifealbum.activities
 
 import android.Manifest.*
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,19 +20,16 @@ import java.util.*
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import org.w3c.dom.Text
 import xaviernadalreales.com.lifealbum.database.NotesDatabase
 import java.io.InputStream
 import java.util.concurrent.Executors
-import java.util.jar.Manifest
 
 
 class CreateNoteActivity : AppCompatActivity() {
@@ -46,7 +45,10 @@ class CreateNoteActivity : AppCompatActivity() {
     companion object {
         private const val REQUESTCODE_PERMISSION = 1
     }
+
     private var RETURNCODE = "ADD_NOTE"
+
+    private var deleteNoteDialog: AlertDialog? = null
 
     private var alreadyAvailableNote: Note? = null
 
@@ -230,6 +232,52 @@ class CreateNoteActivity : AppCompatActivity() {
                 }
             }
         }
+        if (alreadyAvailableNote != null) {
+            layoutColors.findViewById<LinearLayout>(R.id.layoutDeleteNote).visibility = View.VISIBLE
+            layoutColors.findViewById<LinearLayout>(R.id.layoutDeleteNote).setOnClickListener {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                showDeleteDialog()
+            }
+        }
+    }
+
+    private fun showDeleteDialog() {
+        if (deleteNoteDialog == null) {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this@CreateNoteActivity)
+            val view: View = LayoutInflater.from(this)
+                .inflate(
+                    R.layout.layout_delete_note,
+                    findViewById(R.id.layoutDeleteNoteContainer)
+                )
+            builder.setView(view)
+            deleteNoteDialog = builder.create()
+            if (deleteNoteDialog != null) {
+                if (deleteNoteDialog!!.window != null) {
+                    deleteNoteDialog!!.window!!.setBackgroundDrawable(ColorDrawable(0))
+                }
+            }
+            view.findViewById<TextView>(R.id.deleteButtonNote).setOnClickListener {
+                val executor = Executors.newSingleThreadExecutor()
+                val handler = Handler(Looper.getMainLooper())
+
+                executor.execute {
+                    NotesDatabase.getDatabase(applicationContext)?.noteDao()
+                        ?.deleteNote(alreadyAvailableNote)
+                }
+                handler.post {
+                    deleteNoteDialog?.dismiss()
+                    val intent = Intent()
+                    intent.putExtra("REQUEST_CODE", "UPDATE")
+                    intent.putExtra("noteDeleted", true)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                }
+            }
+            view.findViewById<TextView>(R.id.cancelButtonNote).setOnClickListener {
+                deleteNoteDialog?.dismiss()
+            }
+        }
+        deleteNoteDialog?.show()
     }
 
     val resultLauncher =
