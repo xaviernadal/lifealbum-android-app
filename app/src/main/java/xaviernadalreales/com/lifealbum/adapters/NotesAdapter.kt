@@ -15,19 +15,23 @@ import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.entities.Note
+import xaviernadalreales.com.lifealbum.listeners.NotesListener
 
 
 class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
     private var notes: List<Note>
+    private var notesListener: NotesListener
 
-    constructor(notes: List<Note>) {
+    constructor(notes: List<Note>, notesListener: NotesListener) {
         this.notes = notes
+        this.notesListener = notesListener
     }
 
     class NoteViewHolder(@NonNull itemView: View) : RecyclerView.ViewHolder(itemView) {
         var textTitle: TextView = itemView.findViewById(R.id.textTitle)
         var textDate: TextView = itemView.findViewById(R.id.textDate)
+        var textNote: TextView = itemView.findViewById(R.id.textNote)
         var layoutNote: LinearLayout = itemView.findViewById(R.id.layoutNote)
         var imageNote: ImageView = itemView.findViewById(R.id.imageNote)
 
@@ -35,7 +39,8 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
             textTitle.text = note.title
             if (textTitle.text == "") textTitle.visibility = View.GONE
             textDate.text = note.date
-
+            textNote.text = note.noteText
+            if(textNote.text == "") textNote.visibility = View.GONE
 
             val gradientDrawable: GradientDrawable = layoutNote.background as GradientDrawable
             if (note.colorNote != "") {
@@ -44,10 +49,8 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
                 //TODO: Also change this default color haha
                 gradientDrawable.setColor(parseColor("#333333"))
             }
-            Log.d("arribe aqui","si")
-            Log.d("i aqui?", "a" + note.imagePath)
+
             if (note.imagePath != "") {
-                Log.d("arribe aqui","jajajajaajja")
                 imageNote.setImageBitmap(BitmapFactory.decodeFile(note.imagePath))
                 imageNote.visibility = View.VISIBLE
             } else {
@@ -66,6 +69,9 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         holder.setNote(notes[position])
+        holder.layoutNote.setOnClickListener {
+            notesListener.onNoteClicked(notes.get(position), position)
+        }
     }
 
     override fun getItemCount(): Int {

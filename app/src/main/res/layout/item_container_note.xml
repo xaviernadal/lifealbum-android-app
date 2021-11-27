@@ -11,14 +11,12 @@
     android:orientation="vertical"
     tools:ignore="SmallSp">
 
-    <!-- TODO: I could do the rounded corners with a Card or the rounded_background-->
 
+    <!-- For round corners, but all 4 of them are  -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
         app:cardCornerRadius="10dp">
-
         <ImageView
             android:id="@+id/imageNote"
             android:layout_width="match_parent"
@@ -29,15 +27,6 @@
             android:visibility="gone" />
     </androidx.cardview.widget.CardView>
 
-    <!-- <ImageView
-        android:id="@+id/imageNote"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/app_name"
-        android:scaleType="centerCrop"
-        android:visibility="gone" />
-        -->
     <TextView
         android:id="@+id/textTitle"
         android:layout_width="match_parent"
@@ -45,10 +34,11 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="5dp"
         android:fontFamily="@font/montserrat_bold"
         android:includeFontPadding="false"
         android:textColor="@color/white"
-        android:textSize="13sp" />
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/textDate"
@@ -57,10 +47,21 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:fontFamily="@font/montserrat_regular"
+        android:fontFamily="@font/montserrat_light"
         android:includeFontPadding="false"
         android:textColor="@color/note_subtitle"
         android:textSize="7sp" />
+    <TextView
+        android:id="@+id/textNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/montserrat_regular"
+        android:includeFontPadding="false"
+        android:textColor="@color/note_subtitle"
+        android:textSize="11sp" />
 
 
 </LinearLayout>

@@ -44,9 +44,11 @@ class CreateNoteActivity : AppCompatActivity() {
     private lateinit var selectedImagePath: String
 
     companion object {
-        private val REQUESTCODE_PERMISSION = 1
-        private val REQUESTCODE_IMAGE = 2
+        private const val REQUESTCODE_PERMISSION = 1
     }
+    private var RETURNCODE = "ADD_NOTE"
+
+    private var alreadyAvailableNote: Note? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,8 +71,28 @@ class CreateNoteActivity : AppCompatActivity() {
         selectedNoteColor = "#333333"
         selectedImagePath = ""
 
+
+        if (intent.getBooleanExtra("viewOrUpdate", false)) {
+            alreadyAvailableNote = intent.extras?.get("note") as Note
+            setViewOfUpdate()
+            RETURNCODE = "UPDATE"
+        }
+
         initColors()
     }
+
+    private fun setViewOfUpdate() {
+        inputNoteTitle.setText(alreadyAvailableNote!!.title)
+        inputNoteText.setText(alreadyAvailableNote!!.noteText)
+        date.text = alreadyAvailableNote!!.date
+        if (alreadyAvailableNote!!.imagePath != "") {
+            imageNote.setImageBitmap(BitmapFactory.decodeFile(alreadyAvailableNote!!.imagePath))
+            imageNote.visibility = View.VISIBLE
+            selectedImagePath = alreadyAvailableNote!!.imagePath
+        }
+
+    }
+
 
     private fun saveNote() {
         if (inputNoteTitle.text.toString().trim().isEmpty() && inputNoteText.text.toString().trim()
@@ -88,6 +110,14 @@ class CreateNoteActivity : AppCompatActivity() {
         note.colorNote = selectedNoteColor
         note.imagePath = selectedImagePath
 
+
+        //Manually setting an existing id to a new note, to replace the old one. In NoteDAO, the
+        //onConflictStrategy is set to REPLACE
+        if (alreadyAvailableNote != null) {
+            note.id = alreadyAvailableNote!!.id
+        }
+
+
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
 
@@ -95,7 +125,9 @@ class CreateNoteActivity : AppCompatActivity() {
             NotesDatabase.getDatabase(applicationContext)?.noteDao()?.insertNote(note)
         }
         handler.post {
-            setResult(RESULT_OK, Intent())
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            intent.putExtra("REQUEST_CODE", RETURNCODE)
+            setResult(RESULT_OK, intent)
             finish()
         }
     }
@@ -112,6 +144,16 @@ class CreateNoteActivity : AppCompatActivity() {
 
         val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> =
             BottomSheetBehavior.from(layoutColors)
+
+        if (alreadyAvailableNote != null && alreadyAvailableNote!!.colorNote != "") {
+            when (alreadyAvailableNote!!.colorNote) {
+                "#333333" -> layoutColors.findViewById<View>(R.id.viewColor1).performClick()
+                "#FDBE3B" -> layoutColors.findViewById<View>(R.id.viewColor2).performClick()
+                "#FF4842" -> layoutColors.findViewById<View>(R.id.viewColor3).performClick()
+                "#3A52FC" -> layoutColors.findViewById<View>(R.id.viewColor4).performClick()
+                "#000000" -> layoutColors.findViewById<View>(R.id.viewColor5).performClick()
+            }
+        }
 
         layoutColors.findViewById<TextView>(R.id.textColor).setOnClickListener {
             if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
@@ -225,14 +267,15 @@ class CreateNoteActivity : AppCompatActivity() {
             }
         }
     }
-    private fun getPathFromUri(contentUri : Uri): String {
-        val filePath : String
-        val cursor : Cursor? = contentResolver.query(contentUri, null, null,null, null, null)
+
+    private fun getPathFromUri(contentUri: Uri): String {
+        val filePath: String
+        val cursor: Cursor? = contentResolver.query(contentUri, null, null, null, null, null)
         if (cursor == null) {
             filePath = contentUri.path.toString()
         } else {
             cursor.moveToFirst()
-            val index : Int = cursor.getColumnIndex("_data")
+            val index: Int = cursor.getColumnIndex("_data")
             filePath = cursor.getString(index)
             cursor.close()
         }
