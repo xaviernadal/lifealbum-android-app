@@ -78,6 +78,13 @@ class CreateNoteActivity : AppCompatActivity() {
             RETURNCODE = "UPDATE"
         }
 
+        findViewById<ImageView>(R.id.removeImage).setOnClickListener {
+            imageNote.setImageBitmap(null)
+            imageNote.visibility = View.GONE
+            findViewById<ImageView>(R.id.removeImage).visibility = View.GONE
+            selectedImagePath = ""
+        }
+
         initColors()
     }
 
@@ -89,6 +96,7 @@ class CreateNoteActivity : AppCompatActivity() {
             imageNote.setImageBitmap(BitmapFactory.decodeFile(alreadyAvailableNote!!.imagePath))
             imageNote.visibility = View.VISIBLE
             selectedImagePath = alreadyAvailableNote!!.imagePath
+            findViewById<ImageView>(R.id.removeImage).visibility = View.VISIBLE
         }
 
     }
@@ -237,6 +245,7 @@ class CreateNoteActivity : AppCompatActivity() {
                             val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
                             imageNote.setImageBitmap(bitmap)
                             imageNote.visibility = View.VISIBLE
+                            findViewById<ImageView>(R.id.removeImage).visibility = View.VISIBLE
 
                             selectedImagePath = getPathFromUri(selectedImageUri)
 

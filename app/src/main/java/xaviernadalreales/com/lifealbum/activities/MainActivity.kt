@@ -34,9 +34,6 @@ class MainActivity : AppCompatActivity(), NotesListener {
     companion object {
         private var REQUESTCODE = "REQUEST_CODE"
     }
-
-    //https://stackoverflow.com/questions/67886839/how-to-get-requestcode-from-activity-result-api
-
     lateinit var resultLauncher : ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,32 +41,15 @@ class MainActivity : AppCompatActivity(), NotesListener {
         setContentView(R.layout.activity_main)
 
         val imageAddElement: ImageView = findViewById(R.id.add_element)
-        /*
-        val resultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                //I had a lot of trouble here since I save the notes by pressing the back button, and the
-                //resultCode for that is 0 (cancelled), but the RESULT_OK is -1.
-                if (result.resultCode == Activity.RESULT_OK) {
-                    Log.d("claro pero aqui qentre ono", "claro claro4")
-                    val intent = result.data
-                    getNotes()
-                }
-            }
 
-         */
+        //https://stackoverflow.com/questions/67886839/how-to-get-requestcode-from-activity-result-api
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                Log.d("IMPORTANT2", "he arribat?")
-                Log.d("IMPORTANT2", result.resultCode.toString())
                 if (result.resultCode == Activity.RESULT_OK) {
-                    Log.d("IMPORTANT3", "he arribat?")
                     val intent = result.data
                     if (intent != null) {
-                        Log.d("IMPORTANT4", "he arribat?")
                         val requestCode: String? = intent.extras?.getString(REQUESTCODE)
-
                         if (requestCode != null) {
-                            Log.d("IMPORTANT5", "he arribat?")
                             getNotes(requestCode)
                         }
                     }
@@ -100,7 +80,6 @@ class MainActivity : AppCompatActivity(), NotesListener {
             val notes = NotesDatabase.getDatabase(applicationContext)?.noteDao()?.getAllNotes()
 
             handler.post {
-                Log.d("IMPORTANT", requestCode)
                 when (requestCode) {
                     "SHOW" ->
                         if (notes != null) {
