@@ -1,9 +1,12 @@
 package xaviernadalreales.com.lifealbum.adapters
 
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.graphics.Color.parseColor
 import android.graphics.drawable.GradientDrawable
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,16 +19,23 @@ import androidx.recyclerview.widget.RecyclerView
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.entities.Note
 import xaviernadalreales.com.lifealbum.listeners.NotesListener
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.schedule
+import kotlin.concurrent.timerTask
 
 
 class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
     private var notes: List<Note>
     private var notesListener: NotesListener
+    private var timer: Timer? = null
+    private var totalNotes: List<Note>
 
     constructor(notes: List<Note>, notesListener: NotesListener) {
         this.notes = notes
         this.notesListener = notesListener
+        totalNotes = notes
     }
 
     class NoteViewHolder(@NonNull itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -40,7 +50,7 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
             if (textTitle.text == "") textTitle.visibility = View.GONE
             textDate.text = note.date
             textNote.text = note.noteText
-            if(textNote.text == "") textNote.visibility = View.GONE
+            if (textNote.text == "") textNote.visibility = View.GONE
 
             val gradientDrawable: GradientDrawable = layoutNote.background as GradientDrawable
             if (note.colorNote != "") {
@@ -82,5 +92,36 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
         return position
     }
 
-
+    //Using Timer since Handler is deprecated
+    @SuppressLint("NotifyDataSetChanged")
+    fun search(keyword: String) {
+        timer = Timer()
+        timer!!.schedule(
+            timerTask
+            {
+                if (keyword.trim().isEmpty()) {
+                    notes = totalNotes
+                } else {
+                    val temp: ArrayList<Note> = ArrayList()
+                    for (note: Note in totalNotes) {
+                        if (note.title.lowercase()
+                                .contains(keyword.lowercase()) || note.noteText.lowercase()
+                                .contains(keyword.lowercase())
+                        ) {
+                            temp.add(note)
+                        }
+                    }
+                    notes = temp
+                    Handler(Looper.getMainLooper()).post {
+                        notifyDataSetChanged()
+                    }
+                }
+            },
+            //To give time to write the keyword
+            500,
+        )
+    }
+    fun cancelTimer(){
+        timer?.cancel()
+    }
 }

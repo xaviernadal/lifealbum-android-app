@@ -8,11 +8,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import xaviernadalreales.com.lifealbum.R
@@ -70,6 +74,21 @@ class MainActivity : AppCompatActivity(), NotesListener {
         notesAdapter = NotesAdapter(noteList, this)
         recyclerViewNotes.adapter = notesAdapter
         getNotes("SHOW", false)
+
+        //https://stackoverflow.com/questions/40569436/kotlin-addtextchangelistener-lambda
+        val inputSearch: EditText = findViewById(R.id.input_search)
+        inputSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if(noteList.size != 0){
+                    notesAdapter.search(s.toString())
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                notesAdapter.cancelTimer()
+            }
+        })
     }
 
 
