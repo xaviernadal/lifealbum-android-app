@@ -21,6 +21,8 @@
             android:id="@+id/imageNote"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:maxWidth="30dp"
+            android:maxHeight="125dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/app_name"
             android:scaleType="centerCrop"

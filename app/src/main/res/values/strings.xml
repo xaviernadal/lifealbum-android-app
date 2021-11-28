@@ -11,4 +11,5 @@
     <string name="are_you_sure_you_want_to_delete_this_note">Are you sure you want to delete this note?</string>
     <string name="delete_note_button">DELETE NOTE</string>
     <string name="cancel">CANCEL</string>
+    <string name="look_for_memories">Look for memories</string>
 </resources>

@@ -11,15 +11,14 @@
         android:id="@+id/textLifeAlbum"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/montserrat_bold"
         android:includeFontPadding="false"
         android:text="@string/memories"
         android:textColor="@color/black"
         android:textSize="20sp"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/layout_search"
@@ -49,7 +48,7 @@
             android:layout_marginStart="12dp"
             android:background="@null"
             android:fontFamily="@font/montserrat_regular"
-            android:hint="Look for memories"
+            android:hint="@string/look_for_memories"
             android:imeOptions="actionDone"
             android:importantForAutofill="no"
             android:includeFontPadding="false"
@@ -67,34 +66,55 @@
         android:layout_marginStart="2dp"
         android:layout_marginEnd="2dp"
         android:clipToPadding="false"
-        android:paddingEnd="12dp"
         android:paddingStart="0dp"
+        android:paddingEnd="12dp"
         android:paddingBottom="12dp"
-        app:layout_constraintBottom_toTopOf="@id/layoutQuickActions"
-        app:layout_constraintTop_toBottomOf="@id/layout_search"
-        />
+        app:layout_constraintBottom_toTopOf="@id/layout_navigation_lower_menu"
+        app:layout_constraintTop_toBottomOf="@id/layout_search" />
 
 
     <LinearLayout
-        android:id="@+id/layoutQuickActions"
+        android:id="@+id/layout_navigation_lower_menu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:background="@color/colorPrimary"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="5sp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <ImageView
-            android:id="@+id/add_element"
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            app:menu="@menu/bottom_navigation_menu">
 
-            android:src="@drawable/ic_add_squared"
-
-            />
-
+        </com.google.android.material.bottomnavigation.BottomNavigationView>
 
     </LinearLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="225dp" />
+
+    <ImageView
+        android:id="@+id/add_element"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="50dp"
+
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_add_squared"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+
+        app:tint="@color/miscellaneousBackground"
+        tools:ignore="MissingConstraints" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
