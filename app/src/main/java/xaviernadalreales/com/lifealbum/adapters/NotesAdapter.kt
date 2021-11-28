@@ -18,21 +18,20 @@ import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.entities.Note
-import xaviernadalreales.com.lifealbum.listeners.NotesListener
+import xaviernadalreales.com.lifealbum.listeners.GenericListener
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.concurrent.schedule
 import kotlin.concurrent.timerTask
 
 
 class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
     private var notes: List<Note>
-    private var notesListener: NotesListener
+    private var notesListener: GenericListener<Note>
     private var timer: Timer? = null
     private var totalNotes: List<Note>
 
-    constructor(notes: List<Note>, notesListener: NotesListener) {
+    constructor(notes: List<Note>, notesListener: GenericListener<Note>) {
         this.notes = notes
         this.notesListener = notesListener
         totalNotes = notes
@@ -80,7 +79,7 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         holder.setNote(notes[position])
         holder.layoutNote.setOnClickListener {
-            notesListener.onNoteClicked(notes.get(position), position)
+            notesListener.onElementClicked(notes[position], position)
         }
     }
 

@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -34,7 +33,7 @@ import java.util.concurrent.Executors
 
 class CreateNoteActivity : AppCompatActivity() {
 
-    private lateinit var inputNoteTitle: EditText;
+    private lateinit var inputNoteTitle: EditText
     private lateinit var inputNoteText: EditText
     private lateinit var date: TextView
     private lateinit var imageNote: ImageView
@@ -56,7 +55,7 @@ class CreateNoteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_note)
 
-        val imageBack: ImageView = findViewById(R.id.back);
+        val imageBack: ImageView = findViewById(R.id.back)
         imageBack.setOnClickListener { onBackPressed() }
 
         inputNoteTitle = findViewById(R.id.noteTitle)
@@ -191,21 +190,21 @@ class CreateNoteActivity : AppCompatActivity() {
         }
         layoutColors.findViewById<View>(R.id.viewColor3).setOnClickListener {
             selectedNoteColor = "#FF4842"
-            imageColor1.setImageResource(0); imageColor2.setImageResource(0);
+            imageColor1.setImageResource(0); imageColor2.setImageResource(0)
             imageColor3.setImageResource(R.drawable.ic_done); imageColor4.setImageResource(0); imageColor5.setImageResource(
             0
         )
         }
         layoutColors.findViewById<View>(R.id.viewColor4).setOnClickListener {
             selectedNoteColor = "#3A52FC"
-            imageColor1.setImageResource(0); imageColor2.setImageResource(0);
+            imageColor1.setImageResource(0); imageColor2.setImageResource(0)
             imageColor3.setImageResource(0); imageColor4.setImageResource(R.drawable.ic_done); imageColor5.setImageResource(
             0
         )
         }
         layoutColors.findViewById<View>(R.id.viewColor5).setOnClickListener {
             selectedNoteColor = "#000000"
-            imageColor1.setImageResource(0); imageColor2.setImageResource(0);
+            imageColor1.setImageResource(0); imageColor2.setImageResource(0)
             imageColor3.setImageResource(0); imageColor4.setImageResource(0); imageColor5.setImageResource(
             R.drawable.ic_done
         )

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".activities.MainActivity">
+    >
 
     <TextView
         android:id="@+id/textLifeAlbum"
@@ -58,30 +58,6 @@
             android:textSize="13sp" />
     </LinearLayout>
 
-    <!--
-    <androidx.fragment.app.FragmentContainerView
-        app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/fragment_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:name="xaviernadalreales.com.lifealbum.fragments.FragmentHeader"
-        tools:layout="@layout/fragment_header"
-        />
--->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewNotes"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="2dp"
-        android:clipToPadding="false"
-        android:paddingStart="0dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="12dp"
-        app:layout_constraintBottom_toTopOf="@id/layout_navigation_lower_menu"
-        app:layout_constraintTop_toBottomOf="@id/layout_search" />
-
 
     <LinearLayout
         android:id="@+id/layout_navigation_lower_menu"
@@ -125,6 +101,5 @@
 
         app:tint="@color/miscellaneousBackground"
         tools:ignore="MissingConstraints" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

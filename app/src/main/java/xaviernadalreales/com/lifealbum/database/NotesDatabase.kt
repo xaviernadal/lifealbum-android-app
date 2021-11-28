@@ -13,7 +13,6 @@ abstract class NotesDatabase : RoomDatabase() {
 
 
     companion object {
-
         private var notesDatabase: NotesDatabase? = null
 
         @Synchronized
@@ -31,6 +30,5 @@ abstract class NotesDatabase : RoomDatabase() {
     }
 
     abstract fun noteDao(): NoteDao
-
 
 }

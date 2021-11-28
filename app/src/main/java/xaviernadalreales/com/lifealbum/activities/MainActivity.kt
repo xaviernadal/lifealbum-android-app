@@ -7,27 +7,24 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.adapters.NotesAdapter
 import xaviernadalreales.com.lifealbum.database.NotesDatabase
 import xaviernadalreales.com.lifealbum.entities.Note
-import xaviernadalreales.com.lifealbum.listeners.NotesListener
+import xaviernadalreales.com.lifealbum.listeners.GenericListener
 import java.util.concurrent.Executors
 
 
-class MainActivity : AppCompatActivity(), NotesListener {
+class MainActivity : AppCompatActivity(), GenericListener<Note> {
 
     private lateinit var recyclerViewNotes: RecyclerView
     private var noteList: MutableList<Note> = mutableListOf()
@@ -129,12 +126,12 @@ class MainActivity : AppCompatActivity(), NotesListener {
     }
 
 
-    override fun onNoteClicked(note: Note, position: Int) {
+    override fun onElementClicked(element: Note, position: Int) {
         noteClickedPosition = position
         val intent = Intent(applicationContext, CreateNoteActivity::class.java)
         intent.putExtra(REQUESTCODE, "UPDATE")
         intent.putExtra("viewOrUpdate", true)
-        intent.putExtra("note", note)
+        intent.putExtra("note", element)
         resultLauncher.launch(intent)
     }
 }
