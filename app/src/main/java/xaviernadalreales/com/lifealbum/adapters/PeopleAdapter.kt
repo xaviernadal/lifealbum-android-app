@@ -23,7 +23,7 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.PeopleViewHolder> {
     private lateinit var timer: Timer
     private var totalPeople: List<Person>
 
-    constructor(people: MutableList<android.app.Person>, peopleListener: PeopleActivity) {
+    constructor(people: List<Person>, peopleListener: GenericListener<Person>) {
         this.people = people
         this.peopleListener = peopleListener
         this.totalPeople = people

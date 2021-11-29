@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
                     if (intent != null) {
                         val requestCode: String? = intent.extras?.getString(REQUESTCODE)
                         if (requestCode != null) {
-                            Log.d("si o no", intent.getBooleanExtra("noteDeleted" ,false).toString())
                             getNotes(requestCode, intent.getBooleanExtra("noteDeleted", false))
                         }
                     }
@@ -76,12 +75,14 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
         val inputSearch: EditText = findViewById(R.id.input_search)
         inputSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if(noteList.size != 0){
+                if (noteList.size != 0) {
                     notesAdapter.search(s.toString())
                 }
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 notesAdapter.cancelTimer()
             }
@@ -110,7 +111,7 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
                     }
                     "UPDATE" -> {
                         noteList.removeAt(noteClickedPosition)
-                        if (noteDeleted){
+                        if (noteDeleted) {
                             Log.d("pero", "si")
                             notesAdapter.notifyItemRemoved(noteClickedPosition)
                         } else {
