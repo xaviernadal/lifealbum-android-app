@@ -66,7 +66,7 @@ class CreateNoteActivity : AppCompatActivity() {
         imageNote = findViewById(R.id.imageNote)
 
         val imageSave: ImageView = findViewById(R.id.saveNote)
-        imageSave.setOnClickListener { saveNote(); }
+        imageSave.setOnClickListener { saveNote() }
 
         //TODO: Canviar pq es fake
         selectedNoteColor = "#333333"

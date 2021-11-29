@@ -16,6 +16,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.adapters.NotesAdapter
 import xaviernadalreales.com.lifealbum.database.NotesDatabase
@@ -42,8 +44,6 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val imageAddElement: ImageView = findViewById(R.id.add_element)
-
         //https://stackoverflow.com/questions/67886839/how-to-get-requestcode-from-activity-result-api
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -57,6 +57,24 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
                     }
                 }
             }
+        val bnv = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        bnv.setOnItemSelectedListener { item->
+            when (item.itemId) {
+                R.id.page_1 -> recyclerViewNotes.smoothScrollToPosition(0)
+
+                R.id.page_2 -> {
+                    val intent = Intent(applicationContext, PeopleActivity::class.java)
+                    resultLauncher.launch(intent)
+
+                    Log.d("no me jodas", "no me jodas")
+                }
+            }
+            Log.d("no me jodas", "no me jodas")
+            return@setOnItemSelectedListener true
+        }
+
+        val imageAddElement: ImageView = findViewById(R.id.add_element)
 
         imageAddElement.setOnClickListener {
             val intent = Intent(applicationContext, CreateNoteActivity::class.java)

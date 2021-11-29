@@ -7,12 +7,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PersistableBundle
+import android.util.Log
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.adapters.PeopleAdapter
 import xaviernadalreales.com.lifealbum.database.PeopleDatabase
@@ -30,12 +32,13 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
 
     lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d("hola?", "hola?")
         setContentView(R.layout.layout_people)
 
         //TODO:REPEATED CODE
-        val imageAddElement: ImageView = findViewById(R.id.add_element)
+        val buttonAddProfile = findViewById<ExtendedFloatingActionButton>(R.id.add_profile_fab)
 
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -52,9 +55,10 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
                     }
                 }
             }
-        imageAddElement.setOnClickListener {
-            val intent = Intent(applicationContext, CreateNoteActivity::class.java)
-            intent.putExtra("ADD_NOTE", false)
+
+        buttonAddProfile.setOnClickListener {
+            val intent = Intent(this, CreateProfileActivity::class.java)
+            intent.putExtra("ADD_PROFILE", false)
             resultLauncher.launch(intent)
         }
 
@@ -91,9 +95,7 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
                         recyclerViewProfiles.smoothScrollToPosition(0)
                     }
                     "ADD_NOTE" -> {
-                        val intent = Intent(applicationContext, MainActivity::class.java)
-                        intent.putExtra("ADD_NOTE", false)
-                        finish()
+
                     }
                     "UPDATE" -> {
                         peopleList.removeAt(profileClickedPosition)

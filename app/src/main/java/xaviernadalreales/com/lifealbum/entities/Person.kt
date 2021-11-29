@@ -12,7 +12,6 @@ import kotlinx.parcelize.Parcelize
 data class Person(
     @PrimaryKey(autoGenerate = true) var id: Int,
     @ColumnInfo(name = "name") var name: String = "",
-    @ColumnInfo(name = "date") var date: String = "",
     @ColumnInfo(name = "profilePicture") var profilePicture: String = "",
     @ColumnInfo(name = "description") var descriptionText: String = "",
     @ColumnInfo(name = "notesIn") var notesInside: String = ""
