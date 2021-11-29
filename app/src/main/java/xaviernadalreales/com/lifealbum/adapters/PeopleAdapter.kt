@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import xaviernadalreales.com.lifealbum.R
+import xaviernadalreales.com.lifealbum.activities.PeopleActivity
 import xaviernadalreales.com.lifealbum.entities.Person
 import xaviernadalreales.com.lifealbum.listeners.GenericListener
 import java.util.*
@@ -22,7 +23,7 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.PeopleViewHolder> {
     private lateinit var timer: Timer
     private var totalPeople: List<Person>
 
-    constructor(people: List<Person>, peopleListener: GenericListener<Person>) {
+    constructor(people: MutableList<android.app.Person>, peopleListener: PeopleActivity) {
         this.people = people
         this.peopleListener = peopleListener
         this.totalPeople = people
