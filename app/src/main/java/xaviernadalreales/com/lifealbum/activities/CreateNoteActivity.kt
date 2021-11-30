@@ -27,7 +27,6 @@ import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import xaviernadalreales.com.lifealbum.database.NotesDatabase
 import java.io.InputStream
 import java.util.concurrent.Executors

@@ -10,16 +10,12 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.View
 import android.widget.EditText
-import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.navigation.NavigationBarView
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.adapters.NotesAdapter
 import xaviernadalreales.com.lifealbum.database.NotesDatabase
@@ -82,7 +78,7 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
 
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
         recyclerViewNotes.layoutManager =
-            StaggeredGridLayoutManager(2    , StaggeredGridLayoutManager.VERTICAL)
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         notesAdapter = NotesAdapter(noteList, this)
         recyclerViewNotes.adapter = notesAdapter

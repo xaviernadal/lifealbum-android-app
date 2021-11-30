@@ -13,18 +13,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
-import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.database.PeopleDatabase
@@ -50,7 +45,6 @@ class CreateProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("AAAAAAAAAAAAAA", "AAAAAAAAAAAAAAAAAa")
         setContentView(R.layout.activity_create_profile)
 
         val imageBack: ImageView = findViewById(R.id.back)

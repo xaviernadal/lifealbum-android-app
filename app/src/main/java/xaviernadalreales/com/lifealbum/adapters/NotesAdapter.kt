@@ -7,7 +7,6 @@ import android.graphics.Color.parseColor
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -120,7 +119,8 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
             500,
         )
     }
-    fun cancelTimer(){
+
+    fun cancelTimer() {
         timer?.cancel()
     }
 }
