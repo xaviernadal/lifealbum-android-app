@@ -26,6 +26,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import xaviernadalreales.com.lifealbum.database.NotesDatabase
 import java.io.InputStream
 import java.util.concurrent.Executors
@@ -55,6 +57,7 @@ class CreateNoteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_note)
 
+
         val imageBack: ImageView = findViewById(R.id.back)
         imageBack.setOnClickListener { onBackPressed() }
 
@@ -65,7 +68,7 @@ class CreateNoteActivity : AppCompatActivity() {
             SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm a", Locale.getDefault()).format(Date())
         imageNote = findViewById(R.id.imageNote)
 
-        val imageSave: ImageView = findViewById(R.id.saveNote)
+        val imageSave: ExtendedFloatingActionButton = findViewById(R.id.saveNote)
         imageSave.setOnClickListener { saveNote() }
 
         //TODO: Canviar pq es fake
@@ -172,7 +175,6 @@ class CreateNoteActivity : AppCompatActivity() {
             }
         }
 
-        //TODO: Improve this because my eyes are hurting man
         //Colors according to res/values/colors.xml
         layoutColors.findViewById<View>(R.id.viewColor1).setOnClickListener {
             selectedNoteColor = "#333333"

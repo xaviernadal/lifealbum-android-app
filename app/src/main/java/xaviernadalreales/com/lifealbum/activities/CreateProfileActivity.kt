@@ -1,5 +1,6 @@
 package xaviernadalreales.com.lifealbum.activities
 
+import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -16,9 +17,15 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.database.PeopleDatabase
 import xaviernadalreales.com.lifealbum.entities.Person
@@ -53,10 +60,29 @@ class CreateProfileActivity : AppCompatActivity() {
         inputDescription = findViewById(R.id.descriptionProfileAdd)
         profileImage = findViewById(R.id.profileImageAdd)
 
-        val imageSave: ImageView = findViewById(R.id.save_profile_fab)
+        val imageSave: ExtendedFloatingActionButton = findViewById(R.id.save_profile_fab)
         imageSave.setOnClickListener { saveProfile() }
 
+        profileImage.setOnClickListener {
+            when {
+                ContextCompat.checkSelfPermission(
+                    applicationContext,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    selectImage()
+                }
+                shouldShowRequestPermissionRationale("") -> {
 
+                }
+                else -> {
+                    ActivityCompat.requestPermissions(
+                        this, arrayOf(
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ), REQUESTCODE_PERMISSION
+                    )
+                }
+            }
+        }
         if (intent.getBooleanExtra("viewOrUpdate", false)) {
             alreadyAvailableProfile = intent.extras?.get("profile") as Person
             setViewOrUpdate()
@@ -81,7 +107,7 @@ class CreateProfileActivity : AppCompatActivity() {
         }
         val profile = Person(0)
         profile.name = inputName.text.toString()
-        profile.descriptionText = inputDescription.toString()
+        profile.descriptionText = inputDescription.text.toString()
         profile.profilePicture = imagePath
 
         if (alreadyAvailableProfile != null) {

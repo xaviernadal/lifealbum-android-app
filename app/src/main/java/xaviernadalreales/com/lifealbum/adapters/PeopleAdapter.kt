@@ -1,16 +1,20 @@
 package xaviernadalreales.com.lifealbum.adapters
 
 import android.annotation.SuppressLint
+import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.NonNull
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import xaviernadalreales.com.lifealbum.R
-import xaviernadalreales.com.lifealbum.activities.PeopleActivity
 import xaviernadalreales.com.lifealbum.entities.Person
 import xaviernadalreales.com.lifealbum.listeners.GenericListener
 import java.util.*
@@ -30,16 +34,36 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.PeopleViewHolder> {
     }
 
     class PeopleViewHolder(@NonNull itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var nameProfile: TextView = itemView.findViewById(R.id.profileName)
+        var numberNotes: TextView = itemView.findViewById(R.id.profileNumberNotes)
+        var imageProfile: ImageView = itemView.findViewById(R.id.profileImage)
         var layoutProfile: LinearLayout = itemView.findViewById(R.id.layoutProfile)
         fun setPerson(person: Person) {
+            Log.d("SETPERSON", person.name)
+            nameProfile.text = person.name
+            Log.d("SETPERSON", person.notesInside)
+            numberNotes.text = appearsInNotesNumber(person.notesInside)
 
+            if (person.profilePicture != "") {
+                imageProfile.setImageBitmap(BitmapFactory.decodeFile(person.profilePicture))
+            } else {
+                imageProfile.setImageResource(R.drawable.ic_people)
+            }
+        }
+
+        fun appearsInNotesNumber(stringNumber: String): String {
+            val delim = ","
+            val list = stringNumber.split(delim)
+            val size = list.size - 1
+            return "Appears in " + size.toString() + " notes."
         }
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PeopleViewHolder {
         return PeopleViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                R.layout.person_profile, parent, false
+                R.layout.profile_container_note, parent, false
             )
         )
     }

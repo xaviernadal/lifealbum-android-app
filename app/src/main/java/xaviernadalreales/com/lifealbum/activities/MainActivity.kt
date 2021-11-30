@@ -10,6 +10,7 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
@@ -17,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationBarView
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.adapters.NotesAdapter
@@ -59,31 +61,28 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
             }
         val bnv = findViewById<BottomNavigationView>(R.id.bottom_navigation)
 
-        bnv.setOnItemSelectedListener { item->
+        bnv.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.page_1 -> recyclerViewNotes.smoothScrollToPosition(0)
+                R.id.activity_main_item -> recyclerViewNotes.smoothScrollToPosition(0)
 
-                R.id.page_2 -> {
-                    val intent = Intent(applicationContext, PeopleActivity::class.java)
+                R.id.activity_create_note -> {
+                    val intent = Intent(applicationContext, CreateNoteActivity::class.java)
+                    intent.putExtra("ADD_NOTE", true)
                     resultLauncher.launch(intent)
+                }
+                R.id.layout_people -> {
+                    val intent = Intent(this, PeopleActivity::class.java)
+                    startActivity(intent)
 
-                    Log.d("no me jodas", "no me jodas")
                 }
             }
-            Log.d("no me jodas", "no me jodas")
             return@setOnItemSelectedListener true
         }
 
-        val imageAddElement: ImageView = findViewById(R.id.add_element)
 
-        imageAddElement.setOnClickListener {
-            val intent = Intent(applicationContext, CreateNoteActivity::class.java)
-            intent.putExtra("ADD_NOTE", true)
-            resultLauncher.launch(intent)
-        }
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
         recyclerViewNotes.layoutManager =
-            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            StaggeredGridLayoutManager(2    , StaggeredGridLayoutManager.VERTICAL)
 
         notesAdapter = NotesAdapter(noteList, this)
         recyclerViewNotes.adapter = notesAdapter

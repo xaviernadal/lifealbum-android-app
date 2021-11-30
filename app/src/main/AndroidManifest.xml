@@ -14,6 +14,11 @@
         android:theme="@style/Theme.LifeAlbum"
         tools:targetApi="q">
         <activity
+            android:name=".activities.CreateProfileActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"
+            android:exported="true" />
+        <activity
             android:name=".activities.CreateNoteActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"

@@ -58,16 +58,7 @@
             android:textSize="13sp" />
     </LinearLayout>
 
-    <!--
-    <androidx.fragment.app.FragmentContainerView
-        app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/fragment_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:name="xaviernadalreales.com.lifealbum.fragments.FragmentHeader"
-        tools:layout="@layout/fragment_header"
-        />
--->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewNotes"
         android:layout_width="match_parent"
@@ -103,28 +94,6 @@
         </com.google.android.material.bottomnavigation.BottomNavigationView>
 
     </LinearLayout>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="225dp" />
-
-    <ImageView
-        android:id="@+id/add_element"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="50dp"
-
-        android:layout_marginBottom="15dp"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_add_squared"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-
-        app:tint="@color/miscellaneousBackground"
-        tools:ignore="MissingConstraints" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/page_1"
+        android:id="@+id/activity_main_item"
         android:enabled="true"
         android:icon="@drawable/ic_home"
         android:title="Home"/>
 
     <item
-        android:id="@+id/page_2"
+        android:id="@+id/activity_create_note"
+        android:enabled="true"
+        android:icon="@drawable/ic_add_squared"
+        android:title="Add note"/>
+
+    <item
+        android:id="@+id/layout_people"
         android:enabled="true"
         android:icon="@drawable/ic_people"
         android:title="People"/>

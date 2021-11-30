@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.adapters.PeopleAdapter
@@ -34,12 +35,34 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("hola?", "hola?")
         setContentView(R.layout.layout_people)
 
-        //TODO:REPEATED CODE
-        val buttonAddProfile = findViewById<ExtendedFloatingActionButton>(R.id.add_profile_fab)
+        setUpBottomNav()
+        activitiesResults()
+        setUpAddProfileButton()
 
+        recyclerViewProfiles = findViewById(R.id.recyclerViewProfiles)
+        recyclerViewProfiles.layoutManager =
+            StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
+
+        peopleAdapter = PeopleAdapter(peopleList, this)
+        recyclerViewProfiles.adapter = peopleAdapter
+
+        getProfiles("SHOW", false)
+
+
+    }
+
+    private fun setUpAddProfileButton() {
+        val buttonAddProfile = findViewById<ExtendedFloatingActionButton>(R.id.add_profile_fab)
+        buttonAddProfile.setOnClickListener {
+            val intent = Intent(this, CreateProfileActivity::class.java)
+            intent.putExtra("ADD_PROFILE", false)
+            resultLauncher.launch(intent)
+        }
+    }
+
+    private fun activitiesResults() {
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
@@ -55,22 +78,29 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
                     }
                 }
             }
+    }
 
-        buttonAddProfile.setOnClickListener {
-            val intent = Intent(this, CreateProfileActivity::class.java)
-            intent.putExtra("ADD_PROFILE", false)
-            resultLauncher.launch(intent)
+    private fun setUpBottomNav() {
+        val bnv = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        bnv.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.activity_main_item -> {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+
+                }
+
+                R.id.activity_create_note -> {
+                    val intent = Intent(applicationContext, CreateNoteActivity::class.java)
+                    intent.putExtra("ADD_NOTE", true)
+                    resultLauncher.launch(intent)
+                }
+                R.id.layout_people -> recyclerViewProfiles.smoothScrollToPosition(0)
+            }
+            Log.d("no me jodas", "no me jodas")
+            return@setOnItemSelectedListener true
         }
-
-        recyclerViewProfiles = findViewById(R.id.recyclerViewProfiles)
-        recyclerViewProfiles.layoutManager =
-            StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
-
-        peopleAdapter = PeopleAdapter(peopleList, this)
-        recyclerViewProfiles.adapter = peopleAdapter
-        getProfiles("SHOW", false)
-
-
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -78,9 +108,11 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
+            Log.d("A", "a1")
             val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()?.getAllPeople()
 
             handler.post {
+                Log.d("A", "a2")
                 when (requestCode) {
                     "SHOW" ->
                         if (people != null) {
@@ -93,9 +125,6 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
                         }
                         peopleAdapter.notifyItemInserted(0)
                         recyclerViewProfiles.smoothScrollToPosition(0)
-                    }
-                    "ADD_NOTE" -> {
-
                     }
                     "UPDATE" -> {
                         peopleList.removeAt(profileClickedPosition)
