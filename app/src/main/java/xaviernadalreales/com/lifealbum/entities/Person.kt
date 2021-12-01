@@ -14,5 +14,4 @@ data class Person(
     @ColumnInfo(name = "name") var name: String = "",
     @ColumnInfo(name = "profilePicture") var profilePicture: String = "",
     @ColumnInfo(name = "description") var descriptionText: String = "",
-    @ColumnInfo(name = "notesIn") var notesInside: String = ""
 ) : Parcelable

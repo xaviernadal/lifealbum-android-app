@@ -118,6 +118,7 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
                             notesAdapter.notifyDataSetChanged()
                         }
                     "ADD_NOTE" -> {
+                        Log.d("ADDED",notes?.get((0)).toString())
                         noteList.add(0, notes?.get(0)!!)
                         notesAdapter.notifyItemInserted(0)
                         recyclerViewNotes.smoothScrollToPosition(0)

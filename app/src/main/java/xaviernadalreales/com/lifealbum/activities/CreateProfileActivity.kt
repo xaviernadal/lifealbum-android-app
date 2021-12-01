@@ -46,7 +46,7 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
     private var notesList: MutableList<Note> = mutableListOf()
     private lateinit var notesAdapter: NotesAdapter
 
-    private var profileClickedPosition = -1
+    private var noteClickedPosition = -1
     var imagePath: String = ""
 
     companion object {
@@ -86,45 +86,44 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
         if (intent.getBooleanExtra("viewOrUpdate", false)) {
             alreadyAvailableProfile = intent.extras?.get("profile") as Person
             setViewOrUpdate()
-            getNotes()
+            getNotes("SHOW", false)
             RETURNCODE = "UPDATE"
         }
     }
 
+
     @SuppressLint("NotifyDataSetChanged")
-    private fun getNotes() {
-        val notesIds = alreadyAvailableProfile?.notesInside
-        if (notesIds != null) {
-            Log.d("NOTES", notesIds)
-        }
+    private fun getNotes(requestCode: String, noteDeleted: Boolean) {
+        val listOfProfiles: MutableList<String> = mutableListOf()
         val validNotes: MutableList<Note> = mutableListOf()
-        val allNotes = notesIds?.dropLast(1)
-        if (allNotes != "") {
-            val stringNotes = allNotes?.split(",")
-            val executor = Executors.newSingleThreadExecutor()
-            val handler = Handler(Looper.getMainLooper())
-            executor.execute {
-                val notes = NotesDatabase.getDatabase(applicationContext)?.noteDao()
-                    ?.getAllNotes()
-                handler.post {
-                    if (stringNotes != null) {
-                        for (id in stringNotes) {
-                            if (notes != null) {
-                                for (note in notes) {
-                                    if (id.toInt() == note.id) {
-                                        validNotes.add(note)
-                                    }
-                                }
-                            }
+        val executor = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        executor.execute {
+            val notes = NotesDatabase.getDatabase(applicationContext)?.noteDao()
+                ?.getAllNotes()
+            handler.post {
+                if (notes != null) {
+                    for (note in notes) {
+                        val allProfilesInNote = note.profilesInNote.dropLast(1).split(",")
+                        if (allProfilesInNote.contains(alreadyAvailableProfile!!.id.toString())) {
+                            validNotes.add(note)
                         }
                     }
                     notesList.addAll(validNotes)
                     notesAdapter.notifyDataSetChanged()
+                    if (requestCode == "UPDATE") {
+                        notesList.removeAt(noteClickedPosition)
+                        if (noteDeleted) {
+                            notesAdapter.notifyItemRemoved(noteClickedPosition)
+                        } else {
+                            notesList.add(noteClickedPosition, notes[noteClickedPosition])
+                            notesAdapter.notifyItemChanged(noteClickedPosition)
+                        }
+                    }
                 }
             }
+
         }
-
-
     }
 
     private fun activitiesResults() {
@@ -133,6 +132,10 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
                 if (result.resultCode == Activity.RESULT_OK) {
                     val data: Intent? = result.data
                     if (data != null) {
+                        val updatedNote = intent.extras?.get("UPDATE")
+                        if (updatedNote != null) {
+                            getNotes("UPDATE", false)
+                        }
                         val selectedImageUri: Uri? = data.data
                         if (selectedImageUri != null) {
                             try {
@@ -149,6 +152,47 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
                     }
                 }
             }
+    }
+
+
+    private fun setViewOrUpdate() {
+        inputName.setText(alreadyAvailableProfile!!.name)
+        inputDescription.setText(alreadyAvailableProfile!!.descriptionText)
+        if (alreadyAvailableProfile!!.profilePicture != "") {
+            profileImage.setImageBitmap(BitmapFactory.decodeFile(alreadyAvailableProfile!!.profilePicture))
+            imagePath = alreadyAvailableProfile!!.profilePicture
+        }
+
+    }
+
+    private fun saveProfile() {
+        if (inputName.text.toString().isEmpty() && inputDescription.text.toString()
+                .isEmpty()
+        ) {
+            Toast.makeText(this, "Profile is empty.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val profile = Person(0)
+        profile.name = inputName.text.toString()
+        profile.descriptionText = inputDescription.text.toString()
+        profile.profilePicture = imagePath
+
+        if (alreadyAvailableProfile != null) {
+            profile.id = alreadyAvailableProfile!!.id
+        }
+
+        val executor = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        executor.execute {
+            PeopleDatabase.getDatabase(applicationContext)?.personDao()
+                ?.insertPerson(profile)
+        }
+        handler.post {
+            val intent = Intent(applicationContext, PeopleActivity::class.java)
+            intent.putExtra("REQUEST_CODE", RETURNCODE)
+            setResult(RESULT_OK, intent)
+            finish()
+        }
     }
 
     private fun setUpProfileImage() {
@@ -174,47 +218,9 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
         }
     }
 
-    private fun setViewOrUpdate() {
-        Log.d("UDPATE", alreadyAvailableProfile!!.notesInside + "A")
-        inputName.setText(alreadyAvailableProfile!!.name)
-        inputDescription.setText(alreadyAvailableProfile!!.descriptionText)
-        if (alreadyAvailableProfile!!.profilePicture != "") {
-            profileImage.setImageBitmap(BitmapFactory.decodeFile(alreadyAvailableProfile!!.profilePicture))
-            imagePath = alreadyAvailableProfile!!.profilePicture
-        }
-
-    }
-
-    private fun saveProfile() {
-        if (inputName.text.toString().isEmpty() && inputDescription.text.toString().isEmpty()) {
-            Toast.makeText(this, "Profile is empty.", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val profile = Person(0)
-        profile.name = inputName.text.toString()
-        profile.descriptionText = inputDescription.text.toString()
-        profile.profilePicture = imagePath
-
-        if (alreadyAvailableProfile != null) {
-            profile.id = alreadyAvailableProfile!!.id
-        }
-
-        val executor = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
-        executor.execute {
-            PeopleDatabase.getDatabase(applicationContext)?.personDao()?.insertPerson(profile)
-        }
-        handler.post {
-            val intent = Intent(applicationContext, PeopleActivity::class.java)
-            intent.putExtra("REQUEST_CODE", RETURNCODE)
-            setResult(RESULT_OK, intent)
-            finish()
-        }
-    }
-
-
     private fun selectImage() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        val intent =
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         resultLauncher.launch(intent)
     }
 
@@ -235,7 +241,8 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
 
     private fun getPathFromUri(contentUri: Uri): String {
         val filePath: String
-        val cursor: Cursor? = contentResolver.query(contentUri, null, null, null, null, null)
+        val cursor: Cursor? =
+            contentResolver.query(contentUri, null, null, null, null, null)
         if (cursor == null) {
             filePath = contentUri.path.toString()
         } else {
@@ -248,7 +255,12 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
     }
 
     override fun onElementClicked(element: Note, position: Int) {
-        TODO("Not yet implemented")
+        noteClickedPosition = position
+        val intent = Intent(applicationContext, CreateNoteActivity::class.java)
+        intent.putExtra("REQUEST_CODE", "UPDATE")
+        intent.putExtra("viewOrUpdate", true)
+        intent.putExtra("note", element)
+        resultLauncher.launch(intent)
     }
 
 }

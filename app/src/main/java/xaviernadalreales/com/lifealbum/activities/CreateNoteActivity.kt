@@ -59,6 +59,8 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         private const val REQUESTCODE_PERMISSION = 1
     }
 
+    private var personClickedPosition = -1
+
     private var profilesAdded = ""
     private var RETURNCODE = "ADD_NOTE"
     private var deleteNoteDialog: AlertDialog? = null
@@ -201,10 +203,6 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
         executor.execute {
             NotesDatabase.getDatabase(applicationContext)?.noteDao()?.insertNote(note)
-            val notes = NotesDatabase.getDatabase(applicationContext)?.noteDao()?.getAllNotes()
-            val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()?.getAllPeople()
-            val noteId = searchNoteId(notes)
-            setNoteInPerson(noteId, people)
             handler.post {
                 val intent = Intent(applicationContext, MainActivity::class.java)
                 intent.putExtra("REQUEST_CODE", RETURNCODE)
@@ -212,33 +210,6 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                 finish()
             }
         }
-    }
-
-    private fun searchNoteId(notes: List<Note>?): Int {
-        if (notes != null) {
-            return if (alreadyAvailableNote != null) {
-                alreadyAvailableNote!!.id
-            } else {
-                notes.size
-            }
-        }
-        return -1
-    }
-
-    private fun setNoteInPerson(noteId: Int, people: List<Person>?) {
-        val allProfiles = profilesAdded.dropLast(1)
-        val stringProfiles = allProfiles.split(",")
-        if (people != null) {
-            for (person in people) {
-                for (id in stringProfiles) {
-                    if (id.toInt() == person.id) {
-                        person.notesInside += "$noteId,"
-                        PeopleDatabase.getDatabase(applicationContext)?.personDao()?.insertPerson(person)
-                    }
-                }
-            }
-        }
-        Log.d("NOOOOO", people.toString())
     }
 
     private fun activitiesResults() {
@@ -465,6 +436,11 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
     }
 
     override fun onElementClicked(element: Person, position: Int) {
-        TODO("Not yet implemented")
+        personClickedPosition = position
+        val intent = Intent(applicationContext, CreateProfileActivity::class.java)
+        intent.putExtra("REQUEST_CODE", "VIEW")
+        intent.putExtra("viewOrUpdate", true)
+        intent.putExtra("person", element)
+        resultLauncher.launch(intent)
     }
 }

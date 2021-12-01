@@ -40,21 +40,12 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.PeopleViewHolder> {
         fun setPerson(person: Person) {
             Log.d("SETPERSON", person.name)
             nameProfile.text = person.name
-            Log.d("SETPERSON", person.notesInside)
-            numberNotes.text = appearsInNotesNumber(person.notesInside)
 
             if (person.profilePicture != "") {
                 imageProfile.setImageBitmap(BitmapFactory.decodeFile(person.profilePicture))
             } else {
                 imageProfile.setImageResource(R.drawable.ic_people)
             }
-        }
-
-        fun appearsInNotesNumber(stringNumber: String): String {
-            val delim = ","
-            val list = stringNumber.split(delim)
-            val size = list.size - 1
-            return "Appears in " + size.toString() + " notes."
         }
     }
 
