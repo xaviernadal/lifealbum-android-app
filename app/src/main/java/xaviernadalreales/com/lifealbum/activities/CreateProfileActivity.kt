@@ -1,6 +1,7 @@
 package xaviernadalreales.com.lifealbum.activities
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -13,25 +14,39 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import xaviernadalreales.com.lifealbum.R
+import xaviernadalreales.com.lifealbum.adapters.NotesAdapter
+import xaviernadalreales.com.lifealbum.adapters.PeopleAdapter
+import xaviernadalreales.com.lifealbum.database.NotesDatabase
 import xaviernadalreales.com.lifealbum.database.PeopleDatabase
+import xaviernadalreales.com.lifealbum.entities.Note
 import xaviernadalreales.com.lifealbum.entities.Person
+import xaviernadalreales.com.lifealbum.listeners.GenericListener
 import java.io.InputStream
 import java.util.concurrent.Executors
 
-class CreateProfileActivity : AppCompatActivity() {
+class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
     private lateinit var inputName: EditText
     private lateinit var inputDescription: EditText
     private lateinit var profileImage: ImageView
 
+    private lateinit var recyclerViewNotes: RecyclerView
+    private var notesList: MutableList<Note> = mutableListOf()
+    private lateinit var notesAdapter: NotesAdapter
+
+    private var profileClickedPosition = -1
     var imagePath: String = ""
 
     companion object {
@@ -43,10 +58,13 @@ class CreateProfileActivity : AppCompatActivity() {
     private var deleteProfileDialog: AlertDialog? = null
     private var alreadyAvailableProfile: Person? = null
 
+    lateinit var resultLauncher: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_profile)
 
+        activitiesResults()
         val imageBack: ImageView = findViewById(R.id.back)
         imageBack.setOnClickListener { onBackPressed() }
 
@@ -54,9 +72,86 @@ class CreateProfileActivity : AppCompatActivity() {
         inputDescription = findViewById(R.id.descriptionProfileAdd)
         profileImage = findViewById(R.id.profileImageAdd)
 
+        recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
+        recyclerViewNotes.layoutManager =
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
+        notesAdapter = NotesAdapter(notesList, this)
+        recyclerViewNotes.adapter = notesAdapter
+
         val imageSave: ExtendedFloatingActionButton = findViewById(R.id.save_profile_fab)
         imageSave.setOnClickListener { saveProfile() }
+        setUpProfileImage()
 
+        if (intent.getBooleanExtra("viewOrUpdate", false)) {
+            alreadyAvailableProfile = intent.extras?.get("profile") as Person
+            setViewOrUpdate()
+            getNotes()
+            RETURNCODE = "UPDATE"
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun getNotes() {
+        val notesIds = alreadyAvailableProfile?.notesInside
+        if (notesIds != null) {
+            Log.d("NOTES", notesIds)
+        }
+        val validNotes: MutableList<Note> = mutableListOf()
+        val allNotes = notesIds?.dropLast(1)
+        if (allNotes != "") {
+            val stringNotes = allNotes?.split(",")
+            val executor = Executors.newSingleThreadExecutor()
+            val handler = Handler(Looper.getMainLooper())
+            executor.execute {
+                val notes = NotesDatabase.getDatabase(applicationContext)?.noteDao()
+                    ?.getAllNotes()
+                handler.post {
+                    if (stringNotes != null) {
+                        for (id in stringNotes) {
+                            if (notes != null) {
+                                for (note in notes) {
+                                    if (id.toInt() == note.id) {
+                                        validNotes.add(note)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    notesList.addAll(validNotes)
+                    notesAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+
+    }
+
+    private fun activitiesResults() {
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val data: Intent? = result.data
+                    if (data != null) {
+                        val selectedImageUri: Uri? = data.data
+                        if (selectedImageUri != null) {
+                            try {
+                                val inputStream: InputStream? =
+                                    contentResolver.openInputStream(selectedImageUri)
+                                val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
+                                profileImage.setImageBitmap(bitmap)
+                                imagePath = getPathFromUri(selectedImageUri)
+
+                            } catch (e: Exception) {
+                                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
+    private fun setUpProfileImage() {
         profileImage.setOnClickListener {
             when {
                 ContextCompat.checkSelfPermission(
@@ -77,14 +172,10 @@ class CreateProfileActivity : AppCompatActivity() {
                 }
             }
         }
-        if (intent.getBooleanExtra("viewOrUpdate", false)) {
-            alreadyAvailableProfile = intent.extras?.get("profile") as Person
-            setViewOrUpdate()
-            RETURNCODE = "UPDATE"
-        }
     }
 
     private fun setViewOrUpdate() {
+        Log.d("UDPATE", alreadyAvailableProfile!!.notesInside + "A")
         inputName.setText(alreadyAvailableProfile!!.name)
         inputDescription.setText(alreadyAvailableProfile!!.descriptionText)
         if (alreadyAvailableProfile!!.profilePicture != "") {
@@ -121,27 +212,6 @@ class CreateProfileActivity : AppCompatActivity() {
         }
     }
 
-    val resultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                if (data != null) {
-                    val selectedImageUri: Uri? = data.data
-                    if (selectedImageUri != null) {
-                        try {
-                            val inputStream: InputStream? =
-                                contentResolver.openInputStream(selectedImageUri)
-                            val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
-                            profileImage.setImageBitmap(bitmap)
-                            imagePath = getPathFromUri(selectedImageUri)
-
-                        } catch (e: Exception) {
-                            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-            }
-        }
 
     private fun selectImage() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -175,6 +245,10 @@ class CreateProfileActivity : AppCompatActivity() {
             cursor.close()
         }
         return filePath
+    }
+
+    override fun onElementClicked(element: Note, position: Int) {
+        TODO("Not yet implemented")
     }
 
 }

@@ -93,7 +93,7 @@
                 android:textColor="@color/black"
                 android:textColorHint="#9e9e9e"
                 android:textSize="13sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/recyclerViewNotes"
                 app:layout_constraintTop_toBottomOf="@id/imageAndName" />
 
             <ImageView
@@ -101,9 +101,21 @@
                 android:layout_height="1dp"
                 android:src="@drawable/divider"
                 app:layout_constraintTop_toBottomOf="@id/descriptionProfileAdd" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewNotes"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:clipToPadding="false"
+                android:paddingStart="0dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/descriptionProfileAdd" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
+
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/save_profile_fab"

@@ -125,7 +125,6 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
                     "UPDATE" -> {
                         noteList.removeAt(noteClickedPosition)
                         if (noteDeleted) {
-                            Log.d("pero", "si")
                             notesAdapter.notifyItemRemoved(noteClickedPosition)
                         } else {
                             if (notes != null) {

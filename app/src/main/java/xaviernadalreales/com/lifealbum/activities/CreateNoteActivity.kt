@@ -110,9 +110,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getProfiles() {
-        Log.d("PROFILES", profilesAdded)
         val allProfiles = profilesAdded.dropLast(1)
-        Log.d("PROFILES", allProfiles)
         if (allProfiles != "") {
             val stringProfiles = allProfiles.split(",")
             val executor = Executors.newSingleThreadExecutor()
@@ -120,13 +118,14 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
             executor.execute {
                 val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()
                     ?.getAllPeople()
-                val validPeople : MutableList<Person> = mutableListOf()
+                val validPeople: MutableList<Person> = mutableListOf()
                 handler.post {
                     for (id in stringProfiles) {
                         if (people != null) {
                             for (person in people) {
-                                if (id.toInt() == person.id)
+                                if (id.toInt() == person.id) {
                                     validPeople.add(person)
+                                }
                             }
                         }
                     }
@@ -191,7 +190,6 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         note.imagePath = selectedImagePath
         note.profilesInNote = profilesAdded
 
-
         //Manually setting an existing id to a new note, to replace the old one. In NoteDAO, the
         //onConflictStrategy is set to REPLACE
         if (alreadyAvailableNote != null) {
@@ -203,13 +201,44 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
         executor.execute {
             NotesDatabase.getDatabase(applicationContext)?.noteDao()?.insertNote(note)
+            val notes = NotesDatabase.getDatabase(applicationContext)?.noteDao()?.getAllNotes()
+            val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()?.getAllPeople()
+            val noteId = searchNoteId(notes)
+            setNoteInPerson(noteId, people)
+            handler.post {
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                intent.putExtra("REQUEST_CODE", RETURNCODE)
+                setResult(RESULT_OK, intent)
+                finish()
+            }
         }
-        handler.post {
-            val intent = Intent(applicationContext, MainActivity::class.java)
-            intent.putExtra("REQUEST_CODE", RETURNCODE)
-            setResult(RESULT_OK, intent)
-            finish()
+    }
+
+    private fun searchNoteId(notes: List<Note>?): Int {
+        if (notes != null) {
+            return if (alreadyAvailableNote != null) {
+                alreadyAvailableNote!!.id
+            } else {
+                notes.size
+            }
         }
+        return -1
+    }
+
+    private fun setNoteInPerson(noteId: Int, people: List<Person>?) {
+        val allProfiles = profilesAdded.dropLast(1)
+        val stringProfiles = allProfiles.split(",")
+        if (people != null) {
+            for (person in people) {
+                for (id in stringProfiles) {
+                    if (id.toInt() == person.id) {
+                        person.notesInside += "$noteId,"
+                        PeopleDatabase.getDatabase(applicationContext)?.personDao()?.insertPerson(person)
+                    }
+                }
+            }
+        }
+        Log.d("NOOOOO", people.toString())
     }
 
     private fun activitiesResults() {

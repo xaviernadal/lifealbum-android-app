@@ -103,9 +103,9 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
-            Log.d("A", "a1")
-            val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()?.getAllPeople()
 
+            val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()?.getAllPeople()
+            Log.d("AAAAAAAAA", people.toString())
             handler.post {
                 Log.d("A", "a2")
                 when (requestCode) {

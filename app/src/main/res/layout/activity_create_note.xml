@@ -130,24 +130,17 @@
             app:layout_constraintTop_toBottomOf="@id/scrollView" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginTop="10dp"
             android:id="@+id/recyclerViewProfiles"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="10dp"
             android:clipToPadding="false"
             android:paddingStart="0dp"
             android:paddingEnd="12dp"
             android:paddingBottom="12dp"
-            app:layout_constraintBottom_toBottomOf="@id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/scrollView"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/scrollView" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="664dp" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
