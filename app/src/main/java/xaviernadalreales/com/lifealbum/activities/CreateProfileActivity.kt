@@ -9,15 +9,16 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +26,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.adapters.NotesAdapter
@@ -79,6 +81,8 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
         notesAdapter = NotesAdapter(notesList, this)
         recyclerViewNotes.adapter = notesAdapter
 
+
+
         val imageSave: ExtendedFloatingActionButton = findViewById(R.id.save_profile_fab)
         imageSave.setOnClickListener { saveProfile() }
         setUpProfileImage()
@@ -89,12 +93,56 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
             getNotes("SHOW", false)
             RETURNCODE = "UPDATE"
         }
+        if (alreadyAvailableProfile != null) {
+            val deleteImage: ImageView = findViewById(R.id.imageDeleteProfile)
+            deleteImage.visibility = View.VISIBLE
+            deleteImage.setOnClickListener {
+                showDeleteDialog()
+            }
+        }
     }
 
+    private fun showDeleteDialog() {
+        if (deleteProfileDialog == null) {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            val view: View = LayoutInflater.from(this)
+                .inflate(
+                    R.layout.layout_delete_profile,
+                    findViewById(R.id.layoutDeleteProfileContainer)
+                )
+            builder.setView(view)
+            deleteProfileDialog = builder.create()
+            if (deleteProfileDialog != null) {
+                if (deleteProfileDialog!!.window != null) {
+                    deleteProfileDialog!!.window!!.setBackgroundDrawable(ColorDrawable(0))
+                }
+            }
+            view.findViewById<TextView>(R.id.deleteButtonNote).setOnClickListener {
+                val executor = Executors.newSingleThreadExecutor()
+                val handler = Handler(Looper.getMainLooper())
+
+                executor.execute {
+                    PeopleDatabase.getDatabase(applicationContext)?.personDao()
+                        ?.deletePerson(alreadyAvailableProfile!!)
+                }
+                handler.post {
+                    deleteProfileDialog?.dismiss()
+                    val intent = Intent()
+                    intent.putExtra("REQUEST_CODE", "UPDATE")
+                    intent.putExtra("profileDeleted", true)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                }
+            }
+            view.findViewById<TextView>(R.id.cancelButtonNote).setOnClickListener {
+                deleteProfileDialog?.dismiss()
+            }
+        }
+        deleteProfileDialog?.show()
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getNotes(requestCode: String, noteDeleted: Boolean) {
-        val listOfProfiles: MutableList<String> = mutableListOf()
         val validNotes: MutableList<Note> = mutableListOf()
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
@@ -134,7 +182,7 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
                     if (data != null) {
                         val updatedNote = intent.extras?.get("UPDATE")
                         if (updatedNote != null) {
-                            getNotes("UPDATE", false)
+                            getNotes("UPDATE", intent.getBooleanExtra("noteDeleted", false))
                         }
                         val selectedImageUri: Uri? = data.data
                         if (selectedImageUri != null) {

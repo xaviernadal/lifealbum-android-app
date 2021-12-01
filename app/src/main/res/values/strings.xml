@@ -18,4 +18,9 @@
     <string name="look_for_a_profile">Look for a profile</string>
     <string name="add_profile">ADD PROFILE</string>
     <string name="done">DONE</string>
+    <string name="delete_profile">Delete profile</string>
+    <string name="are_you_sure_you_want_to_delete_this_profile">Are you sure you want to delete this profile</string>
+    <string name="delete">Delete</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
 </resources>

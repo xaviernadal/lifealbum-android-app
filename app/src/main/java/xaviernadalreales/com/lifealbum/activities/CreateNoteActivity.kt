@@ -80,7 +80,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         isUpdateView()
         setUpRemoveImageButton()
         initColors()
-        getProfiles()
+        getProfiles("SHOW", false)
     }
 
     private fun setUpBackButton() {
@@ -111,7 +111,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun getProfiles() {
+    private fun getProfiles(requestCode: String, noteDeleted: Boolean) {
         val allProfiles = profilesAdded.dropLast(1)
         if (allProfiles != "") {
             val stringProfiles = allProfiles.split(",")
@@ -133,6 +133,15 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                     }
                     peopleList.addAll(validPeople)
                     peopleAdapter.notifyDataSetChanged()
+                    if (requestCode == "UPDATE") {
+                        peopleList.removeAt(personClickedPosition)
+                        if (noteDeleted) {
+                            peopleAdapter.notifyItemRemoved(personClickedPosition)
+                        } else {
+                            peopleList.add(personClickedPosition, people!![personClickedPosition])
+                            peopleAdapter.notifyItemChanged(personClickedPosition)
+                        }
+                    }
                 }
             }
         }
@@ -221,6 +230,12 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                         val selectedProfile = data.extras?.get("SELECT_PROFILE")
                         if (selectedProfile != null) {
                             showSelectedProfile(selectedProfile as Person)
+                        }
+                        val requestCode = data.extras?.get("REQUEST_CODE")
+                        if (requestCode != null) {
+                            if (data.getBooleanExtra("profileDeleted", false)){
+                                getProfiles("UPDATE", true)
+                            }
                         }
                         val selectedImageUri: Uri? = data.data
                         if (selectedImageUri != null) {
@@ -396,7 +411,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                 .show()
         } else {
             profilesAdded += element.id.toString() + ","
-            getProfiles()
+            getProfiles("SHOW", false)
         }
     }
 
@@ -438,9 +453,9 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
     override fun onElementClicked(element: Person, position: Int) {
         personClickedPosition = position
         val intent = Intent(applicationContext, CreateProfileActivity::class.java)
-        intent.putExtra("REQUEST_CODE", "VIEW")
+        intent.putExtra("REQUEST_CODE", "UPDATE")
         intent.putExtra("viewOrUpdate", true)
-        intent.putExtra("person", element)
+        intent.putExtra("profile", element)
         resultLauncher.launch(intent)
     }
 }

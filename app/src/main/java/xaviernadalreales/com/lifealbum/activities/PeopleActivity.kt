@@ -6,7 +6,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.widget.EditText
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +41,23 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
         setUpBottomNav()
         activitiesResults()
         setUpAddProfileButton()
+
+        val inputSearch: EditText = findViewById(R.id.input_search)
+        inputSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (peopleList.size != 0) {
+                    peopleAdapter.search(s.toString())
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                peopleAdapter.cancelTimer()
+            }
+        })
+    
 
         recyclerViewProfiles = findViewById(R.id.recyclerViewProfiles)
         recyclerViewProfiles.layoutManager =
