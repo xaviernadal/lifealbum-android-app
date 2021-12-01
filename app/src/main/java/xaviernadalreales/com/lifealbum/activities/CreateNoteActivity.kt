@@ -1,6 +1,7 @@
 package xaviernadalreales.com.lifealbum.activities
 
 import android.Manifest.*
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -19,20 +20,28 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import xaviernadalreales.com.lifealbum.adapters.PeopleAdapter
 import xaviernadalreales.com.lifealbum.database.NotesDatabase
+import xaviernadalreales.com.lifealbum.database.PeopleDatabase
+import xaviernadalreales.com.lifealbum.entities.Person
+import xaviernadalreales.com.lifealbum.listeners.GenericListener
 import java.io.InputStream
 import java.util.concurrent.Executors
 
 
-class CreateNoteActivity : AppCompatActivity() {
+class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
     private lateinit var inputNoteTitle: EditText
     private lateinit var inputNoteText: EditText
@@ -42,59 +51,119 @@ class CreateNoteActivity : AppCompatActivity() {
     private lateinit var selectedNoteColor: String
     private lateinit var selectedImagePath: String
 
+    private lateinit var recyclerViewProfiles: RecyclerView
+    private var peopleList: MutableList<Person> = mutableListOf()
+    private lateinit var peopleAdapter: PeopleAdapter
+
     companion object {
         private const val REQUESTCODE_PERMISSION = 1
     }
 
+    private var profilesAdded = ""
     private var RETURNCODE = "ADD_NOTE"
-
     private var deleteNoteDialog: AlertDialog? = null
-
     private var alreadyAvailableNote: Note? = null
+
+    lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_note)
 
 
+        activitiesResults()
+        setUpBackButton()
+        setUpNoteContent()
+        setUpSaveButton()
+        isUpdateView()
+        setUpRemoveImageButton()
+        initColors()
+        getProfiles()
+    }
+
+    private fun setUpBackButton() {
         val imageBack: ImageView = findViewById(R.id.back)
         imageBack.setOnClickListener { onBackPressed() }
+    }
 
+    private fun setUpNoteContent() {
         inputNoteTitle = findViewById(R.id.noteTitle)
         inputNoteText = findViewById(R.id.note)
         date = findViewById(R.id.date)
         date.text =
             SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm a", Locale.getDefault()).format(Date())
         imageNote = findViewById(R.id.imageNote)
-
-        val imageSave: ExtendedFloatingActionButton = findViewById(R.id.saveNote)
-        imageSave.setOnClickListener { saveNote() }
-
         //TODO: Canviar pq es fake
         selectedNoteColor = "#333333"
         selectedImagePath = ""
+        setUpRecyclerViewContent()
+    }
 
+    private fun setUpRecyclerViewContent() {
+        recyclerViewProfiles = findViewById(R.id.recyclerViewProfiles)
+        recyclerViewProfiles.layoutManager =
+            StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
 
+        peopleAdapter = PeopleAdapter(peopleList, this)
+        recyclerViewProfiles.adapter = peopleAdapter
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun getProfiles() {
+        Log.d("PROFILES", profilesAdded)
+        val allProfiles = profilesAdded.dropLast(1)
+        Log.d("PROFILES", allProfiles)
+        if (allProfiles != "") {
+            val stringProfiles = allProfiles.split(",")
+            val executor = Executors.newSingleThreadExecutor()
+            val handler = Handler(Looper.getMainLooper())
+            executor.execute {
+                val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()
+                    ?.getAllPeople()
+                val validPeople : MutableList<Person> = mutableListOf()
+                handler.post {
+                    for (id in stringProfiles) {
+                        if (people != null) {
+                            for (person in people) {
+                                if (id.toInt() == person.id)
+                                    validPeople.add(person)
+                            }
+                        }
+                    }
+                    peopleList.addAll(validPeople)
+                    peopleAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+    }
+
+    private fun setUpSaveButton() {
+        val imageSave: ExtendedFloatingActionButton = findViewById(R.id.saveNote)
+        imageSave.setOnClickListener { saveNote() }
+    }
+
+    private fun isUpdateView() {
         if (intent.getBooleanExtra("viewOrUpdate", false)) {
             alreadyAvailableNote = intent.extras?.get("note") as Note
             setViewOfUpdate()
             RETURNCODE = "UPDATE"
         }
+    }
 
+    private fun setUpRemoveImageButton() {
         findViewById<ImageView>(R.id.removeImage).setOnClickListener {
             imageNote.setImageBitmap(null)
             imageNote.visibility = View.GONE
             findViewById<ImageView>(R.id.removeImage).visibility = View.GONE
             selectedImagePath = ""
         }
-
-        initColors()
     }
 
     private fun setViewOfUpdate() {
         inputNoteTitle.setText(alreadyAvailableNote!!.title)
         inputNoteText.setText(alreadyAvailableNote!!.noteText)
         date.text = alreadyAvailableNote!!.date
+        profilesAdded = alreadyAvailableNote!!.profilesInNote
         if (alreadyAvailableNote!!.imagePath != "") {
             imageNote.setImageBitmap(BitmapFactory.decodeFile(alreadyAvailableNote!!.imagePath))
             imageNote.visibility = View.VISIBLE
@@ -120,6 +189,7 @@ class CreateNoteActivity : AppCompatActivity() {
         note.date = date.text.toString()
         note.colorNote = selectedNoteColor
         note.imagePath = selectedImagePath
+        note.profilesInNote = profilesAdded
 
 
         //Manually setting an existing id to a new note, to replace the old one. In NoteDAO, the
@@ -127,7 +197,6 @@ class CreateNoteActivity : AppCompatActivity() {
         if (alreadyAvailableNote != null) {
             note.id = alreadyAvailableNote!!.id
         }
-
 
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
@@ -142,6 +211,38 @@ class CreateNoteActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    private fun activitiesResults() {
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val data: Intent? = result.data
+                    if (data != null) {
+                        val selectedProfile = data.extras?.get("SELECT_PROFILE")
+                        if (selectedProfile != null) {
+                            showSelectedProfile(selectedProfile as Person)
+                        }
+                        val selectedImageUri: Uri? = data.data
+                        if (selectedImageUri != null) {
+                            try {
+                                val inputStream: InputStream? =
+                                    contentResolver.openInputStream(selectedImageUri)
+                                val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
+                                imageNote.setImageBitmap(bitmap)
+                                imageNote.visibility = View.VISIBLE
+                                findViewById<ImageView>(R.id.removeImage).visibility = View.VISIBLE
+
+                                selectedImagePath = getPathFromUri(selectedImageUri)
+
+                            } catch (e: Exception) {
+                                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
 
     private fun initColors() {
 
@@ -232,6 +333,14 @@ class CreateNoteActivity : AppCompatActivity() {
                 }
             }
         }
+
+        layoutColors.findViewById<LinearLayout>(R.id.addProfile).setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            val intent = Intent(this, SelectProfile::class.java)
+            intent.putExtra("SELECT_PROFILE", true)
+            resultLauncher.launch(intent)
+        }
+
         if (alreadyAvailableNote != null) {
             layoutColors.findViewById<LinearLayout>(R.id.layoutDeleteNote).visibility = View.VISIBLE
             layoutColors.findViewById<LinearLayout>(R.id.layoutDeleteNote).setOnClickListener {
@@ -280,30 +389,17 @@ class CreateNoteActivity : AppCompatActivity() {
         deleteNoteDialog?.show()
     }
 
-    val resultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                if (data != null) {
-                    val selectedImageUri: Uri? = data.data
-                    if (selectedImageUri != null) {
-                        try {
-                            val inputStream: InputStream? =
-                                contentResolver.openInputStream(selectedImageUri)
-                            val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
-                            imageNote.setImageBitmap(bitmap)
-                            imageNote.visibility = View.VISIBLE
-                            findViewById<ImageView>(R.id.removeImage).visibility = View.VISIBLE
 
-                            selectedImagePath = getPathFromUri(selectedImageUri)
-
-                        } catch (e: Exception) {
-                            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-            }
+    private fun showSelectedProfile(element: Person) {
+        if (element.id.toString() in profilesAdded.split(",")) {
+            Toast.makeText(this, "You already have this profile in this note.", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            profilesAdded += element.id.toString() + ","
+            getProfiles()
         }
+    }
+
 
     private fun selectImage() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -337,5 +433,9 @@ class CreateNoteActivity : AppCompatActivity() {
             cursor.close()
         }
         return filePath
+    }
+
+    override fun onElementClicked(element: Person, position: Int) {
+        TODO("Not yet implemented")
     }
 }

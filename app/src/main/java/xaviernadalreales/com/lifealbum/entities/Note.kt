@@ -15,5 +15,6 @@ data class Note(
     @ColumnInfo(name = "noteText") var noteText: String = "",
     @ColumnInfo(name = "image_path") var imagePath: String = "",
     @ColumnInfo(name = "colorNote") var colorNote: String = "",
-    @ColumnInfo(name = "webLink") var webLink: String = ""
+    @ColumnInfo(name = "webLink") var webLink: String = "",
+    @ColumnInfo(name = "profilesInNote") var profilesInNote: String = ""
 ) : Parcelable

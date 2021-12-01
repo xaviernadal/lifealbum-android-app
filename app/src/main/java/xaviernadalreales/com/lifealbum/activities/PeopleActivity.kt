@@ -47,9 +47,8 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
         recyclerViewProfiles.adapter = peopleAdapter
 
         getProfiles("SHOW", false)
-
-
     }
+
 
     private fun setUpAddProfileButton() {
         val buttonAddProfile = findViewById<ExtendedFloatingActionButton>(R.id.add_profile_fab)
@@ -86,7 +85,6 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
                 R.id.activity_main_item -> {
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
-
                 }
 
                 R.id.activity_create_note -> {
@@ -96,7 +94,6 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
                 }
                 R.id.layout_people -> recyclerViewProfiles.smoothScrollToPosition(0)
             }
-            Log.d("no me jodas", "no me jodas")
             return@setOnItemSelectedListener true
         }
     }
