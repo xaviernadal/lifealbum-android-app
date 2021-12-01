@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -80,7 +79,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         isUpdateView()
         setUpRemoveImageButton()
         initColors()
-        getProfiles("SHOW", false)
+        getProfiles("SHOW", false, null)
     }
 
     private fun setUpBackButton() {
@@ -111,7 +110,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun getProfiles(requestCode: String, noteDeleted: Boolean) {
+    private fun getProfiles(requestCode: String, noteDeleted: Boolean, personAdded: Person?) {
         val allProfiles = profilesAdded.dropLast(1)
         if (allProfiles != "") {
             val stringProfiles = allProfiles.split(",")
@@ -122,24 +121,42 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                     ?.getAllPeople()
                 val validPeople: MutableList<Person> = mutableListOf()
                 handler.post {
-                    for (id in stringProfiles) {
-                        if (people != null) {
-                            for (person in people) {
-                                if (id.toInt() == person.id) {
-                                    validPeople.add(person)
+                    when (requestCode) {
+                        "SHOW" -> {
+                            for (id in stringProfiles) {
+                                if (people != null) {
+                                    for (person in people) {
+                                        if (id.toInt() == person.id) {
+                                            validPeople.add(person)
+                                        }
+                                    }
+                                }
+                            }
+
+                            peopleList.addAll(validPeople)
+                            peopleAdapter.notifyDataSetChanged()
+                        }
+                        "UPDATE" -> {
+                            if (requestCode == "UPDATE") {
+                                peopleList.removeAt(personClickedPosition)
+                                if (noteDeleted) {
+                                    peopleAdapter.notifyItemRemoved(personClickedPosition)
+                                } else {
+                                    peopleList.add(
+                                        personClickedPosition,
+                                        people!![personClickedPosition]
+                                    )
+                                    peopleAdapter.notifyItemChanged(personClickedPosition)
                                 }
                             }
                         }
-                    }
-                    peopleList.addAll(validPeople)
-                    peopleAdapter.notifyDataSetChanged()
-                    if (requestCode == "UPDATE") {
-                        peopleList.removeAt(personClickedPosition)
-                        if (noteDeleted) {
-                            peopleAdapter.notifyItemRemoved(personClickedPosition)
-                        } else {
-                            peopleList.add(personClickedPosition, people!![personClickedPosition])
-                            peopleAdapter.notifyItemChanged(personClickedPosition)
+                        "ADDED" -> {
+                            if (personAdded != null) {
+                                peopleList.add(personAdded)
+                                peopleAdapter.notifyItemInserted(0)
+                                recyclerViewProfiles.smoothScrollToPosition(0)
+                            }
+
                         }
                     }
                 }
@@ -185,7 +202,8 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
 
     private fun saveNote() {
-        if (inputNoteTitle.text.toString().trim().isEmpty() && inputNoteText.text.toString().trim()
+        if (inputNoteTitle.text.toString().trim().isEmpty() && inputNoteText.text.toString()
+                .trim()
                 .isEmpty()
         ) {
             Toast.makeText(this, "Note is empty.", Toast.LENGTH_SHORT).show()
@@ -233,8 +251,8 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                         }
                         val requestCode = data.extras?.get("REQUEST_CODE")
                         if (requestCode != null) {
-                            if (data.getBooleanExtra("profileDeleted", false)){
-                                getProfiles("UPDATE", true)
+                            if (data.getBooleanExtra("profileDeleted", false)) {
+                                getProfiles("UPDATE", true, null)
                             }
                         }
                         val selectedImageUri: Uri? = data.data
@@ -245,7 +263,8 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                                 val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
                                 imageNote.setImageBitmap(bitmap)
                                 imageNote.visibility = View.VISIBLE
-                                findViewById<ImageView>(R.id.removeImage).visibility = View.VISIBLE
+                                findViewById<ImageView>(R.id.removeImage).visibility =
+                                    View.VISIBLE
 
                                 selectedImagePath = getPathFromUri(selectedImageUri)
 
@@ -357,7 +376,8 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         }
 
         if (alreadyAvailableNote != null) {
-            layoutColors.findViewById<LinearLayout>(R.id.layoutDeleteNote).visibility = View.VISIBLE
+            layoutColors.findViewById<LinearLayout>(R.id.layoutDeleteNote).visibility =
+                View.VISIBLE
             layoutColors.findViewById<LinearLayout>(R.id.layoutDeleteNote).setOnClickListener {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 showDeleteDialog()
@@ -407,11 +427,15 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
     private fun showSelectedProfile(element: Person) {
         if (element.id.toString() in profilesAdded.split(",")) {
-            Toast.makeText(this, "You already have this profile in this note.", Toast.LENGTH_SHORT)
+            Toast.makeText(
+                this,
+                "You already have this profile in this note.",
+                Toast.LENGTH_SHORT
+            )
                 .show()
         } else {
             profilesAdded += element.id.toString() + ","
-            getProfiles("SHOW", false)
+            getProfiles("ADDED", false, element)
         }
     }
 

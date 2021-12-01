@@ -12,7 +12,6 @@
     <string name="delete_note_button">Delete note</string>
     <string name="cancel">Cancel</string>
     <string name="look_for_memories">Look for memories</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="look_for_people">Look for people</string>
     <string name="look_for_a_profile">Look for a profile</string>

@@ -30,7 +30,7 @@
         <entry key="app/src/main/res/drawable/round_outline.xml" value="0.10185185185185185" />
         <entry key="app/src/main/res/layout-v31/item_container_note.xml" value="0.1765625" />
         <entry key="app/src/main/res/layout/activity_create_note.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/activity_create_profile.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_create_profile.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_header.xml" value="0.16018518518518518" />
         <entry key="app/src/main/res/layout/fragment_profiles_in_note.xml" value="0.35572916666666665" />

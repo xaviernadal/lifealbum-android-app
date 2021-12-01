@@ -27,7 +27,6 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
     private lateinit var peopleAdapter: PeopleAdapter
 
     private var profileClickedPosition = -1
-    private var addedProfile = false
     lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +44,7 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
         peopleAdapter = PeopleAdapter(peopleList, this)
         recyclerViewProfiles.adapter = peopleAdapter
 
-        getProfiles()
+        getProfiles(false)
     }
 
     private fun setUpAddProfileButton() {
@@ -65,7 +64,7 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
                     if (intent != null) {
                         val added = intent.extras?.get("REQUEST_CODE")
                         if (added == "ADD_PROFILE") {
-                            addedProfile = true
+                            getProfiles(true)
                         }
                     }
                 }
@@ -84,18 +83,17 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun getProfiles() {
+    private fun getProfiles(added: Boolean) {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
             val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()?.getAllPeople()
             handler.post {
                 if (people != null) {
-                    if (addedProfile) {
+                    if (added) {
                         peopleList.add(0, people[0])
                         peopleAdapter.notifyItemInserted(0)
-                        peopleAdapter.notifyDataSetChanged()
-
+                        recyclerViewProfiles.smoothScrollToPosition(0)
                     } else {
                         peopleList.addAll(people)
                         peopleAdapter.notifyDataSetChanged()
