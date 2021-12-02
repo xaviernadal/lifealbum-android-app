@@ -42,6 +42,16 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        activitiesResult()
+        setUpBottomNavigation()
+        setUpRecyclerVew()
+        searchNotes()
+
+
+        getNotes("SHOW", false)
+    }
+
+    private fun activitiesResult() {
         //https://stackoverflow.com/questions/67886839/how-to-get-requestcode-from-activity-result-api
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -55,8 +65,10 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
                     }
                 }
             }
-        val bnv = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+    }
 
+    private fun setUpBottomNavigation() {
+        val bnv = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bnv.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.activity_main_item -> recyclerViewNotes.smoothScrollToPosition(0)
@@ -74,16 +86,18 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
             }
             return@setOnItemSelectedListener true
         }
+    }
 
-
+    private fun setUpRecyclerVew() {
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
         recyclerViewNotes.layoutManager =
             StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         notesAdapter = NotesAdapter(noteList, this)
         recyclerViewNotes.adapter = notesAdapter
-        getNotes("SHOW", false)
+    }
 
+    private fun searchNotes() {
         //https://stackoverflow.com/questions/40569436/kotlin-addtextchangelistener-lambda
         val inputSearch: EditText = findViewById(R.id.input_search)
         inputSearch.addTextChangedListener(object : TextWatcher {
@@ -137,7 +151,6 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
             }
         }
     }
-
 
     override fun onElementClicked(element: Note, position: Int) {
         noteClickedPosition = position

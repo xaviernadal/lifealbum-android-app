@@ -71,9 +71,8 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_note)
 
-
-        activitiesResults()
         setUpBackButton()
+        activitiesResults()
         setUpNoteContent()
         setUpSaveButton()
         isUpdateView()
@@ -87,6 +86,45 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         imageBack.setOnClickListener { onBackPressed() }
     }
 
+    private fun activitiesResults() {
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val data: Intent? = result.data
+                    if (data != null) {
+                        val selectedProfile = data.extras?.get("SELECT_PROFILE")
+                        if (selectedProfile != null) {
+                            showSelectedProfile(selectedProfile as Person)
+                        }
+                        val requestCode = data.extras?.get("REQUEST_CODE")
+                        if (requestCode != null) {
+                            if (data.getBooleanExtra("profileDeleted", false)) {
+                                getProfiles("UPDATE", true, null)
+                            }
+                        }
+                        val selectedImageUri: Uri? = data.data
+                        if (selectedImageUri != null) {
+                            try {
+                                val inputStream: InputStream? =
+                                    contentResolver.openInputStream(selectedImageUri)
+                                val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
+                                imageNote.setImageBitmap(bitmap)
+                                imageNote.visibility = View.VISIBLE
+                                findViewById<ImageView>(R.id.removeImage).visibility =
+                                    View.VISIBLE
+
+                                selectedImagePath = getPathFromUri(selectedImageUri)
+
+                            } catch (e: Exception) {
+                                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
+
     private fun setUpNoteContent() {
         inputNoteTitle = findViewById(R.id.noteTitle)
         inputNoteText = findViewById(R.id.note)
@@ -94,8 +132,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         date.text =
             SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm a", Locale.getDefault()).format(Date())
         imageNote = findViewById(R.id.imageNote)
-        //TODO: Canviar pq es fake
-        selectedNoteColor = "#333333"
+        selectedNoteColor = "#ECEFF1"
         selectedImagePath = ""
         setUpRecyclerViewContent()
     }
@@ -240,47 +277,8 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         }
     }
 
-    private fun activitiesResults() {
-        resultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val data: Intent? = result.data
-                    if (data != null) {
-                        val selectedProfile = data.extras?.get("SELECT_PROFILE")
-                        if (selectedProfile != null) {
-                            showSelectedProfile(selectedProfile as Person)
-                        }
-                        val requestCode = data.extras?.get("REQUEST_CODE")
-                        if (requestCode != null) {
-                            if (data.getBooleanExtra("profileDeleted", false)) {
-                                getProfiles("UPDATE", true, null)
-                            }
-                        }
-                        val selectedImageUri: Uri? = data.data
-                        if (selectedImageUri != null) {
-                            try {
-                                val inputStream: InputStream? =
-                                    contentResolver.openInputStream(selectedImageUri)
-                                val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
-                                imageNote.setImageBitmap(bitmap)
-                                imageNote.visibility = View.VISIBLE
-                                findViewById<ImageView>(R.id.removeImage).visibility =
-                                    View.VISIBLE
-
-                                selectedImagePath = getPathFromUri(selectedImageUri)
-
-                            } catch (e: Exception) {
-                                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-                }
-            }
-    }
-
 
     private fun initColors() {
-
         val layoutColors: LinearLayout = findViewById(R.id.layoutColors)
 
         val imageColor1: ImageView = layoutColors.findViewById(R.id.imageColor1)
@@ -294,11 +292,11 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
         if (alreadyAvailableNote != null && alreadyAvailableNote!!.colorNote != "") {
             when (alreadyAvailableNote!!.colorNote) {
-                "#333333" -> layoutColors.findViewById<View>(R.id.viewColor1).performClick()
-                "#FDBE3B" -> layoutColors.findViewById<View>(R.id.viewColor2).performClick()
-                "#FF4842" -> layoutColors.findViewById<View>(R.id.viewColor3).performClick()
-                "#3A52FC" -> layoutColors.findViewById<View>(R.id.viewColor4).performClick()
-                "#000000" -> layoutColors.findViewById<View>(R.id.viewColor5).performClick()
+                "#ECEFF1" -> layoutColors.findViewById<View>(R.id.viewColor1).performClick()
+                "#80deea" -> layoutColors.findViewById<View>(R.id.viewColor2).performClick()
+                "#ffd54f" -> layoutColors.findViewById<View>(R.id.viewColor3).performClick()
+                "#aed581" -> layoutColors.findViewById<View>(R.id.viewColor4).performClick()
+                "#333333" -> layoutColors.findViewById<View>(R.id.viewColor5).performClick()
             }
         }
 
@@ -310,37 +308,37 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
             }
         }
 
-        //Colors according to res/values/colors.xml
+        //These are colors note_default, note_color2, note_color3, note_color4, note_color5 in res/values/colors.xml
         layoutColors.findViewById<View>(R.id.viewColor1).setOnClickListener {
-            selectedNoteColor = "#333333"
+            selectedNoteColor = "#ECEFF1"
             imageColor1.setImageResource(R.drawable.ic_done); imageColor2.setImageResource(0)
             imageColor3.setImageResource(0); imageColor4.setImageResource(0); imageColor5.setImageResource(
             0
         )
         }
         layoutColors.findViewById<View>(R.id.viewColor2).setOnClickListener {
-            selectedNoteColor = "#FDBE3B"
+            selectedNoteColor = "#80deea"
             imageColor1.setImageResource(0); imageColor2.setImageResource(R.drawable.ic_done)
             imageColor3.setImageResource(0); imageColor4.setImageResource(0); imageColor5.setImageResource(
             0
         )
         }
         layoutColors.findViewById<View>(R.id.viewColor3).setOnClickListener {
-            selectedNoteColor = "#FF4842"
+            selectedNoteColor = "#ffd54f"
             imageColor1.setImageResource(0); imageColor2.setImageResource(0)
             imageColor3.setImageResource(R.drawable.ic_done); imageColor4.setImageResource(0); imageColor5.setImageResource(
             0
         )
         }
         layoutColors.findViewById<View>(R.id.viewColor4).setOnClickListener {
-            selectedNoteColor = "#3A52FC"
+            selectedNoteColor = "#aed581"
             imageColor1.setImageResource(0); imageColor2.setImageResource(0)
             imageColor3.setImageResource(0); imageColor4.setImageResource(R.drawable.ic_done); imageColor5.setImageResource(
             0
         )
         }
         layoutColors.findViewById<View>(R.id.viewColor5).setOnClickListener {
-            selectedNoteColor = "#000000"
+            selectedNoteColor = "#333333"
             imageColor1.setImageResource(0); imageColor2.setImageResource(0)
             imageColor3.setImageResource(0); imageColor4.setImageResource(0); imageColor5.setImageResource(
             R.drawable.ic_done

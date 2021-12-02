@@ -7,9 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
-    <!-- new -->
-
     <color name="colorPrimary">#ECEFF1</color>
     <color name="colorPrimaryDark">#292929</color>
     <color name="colorAccent">#FDBE3B</color>
@@ -18,13 +15,13 @@
     <color name="quickActionsBackground">#2F2D2E</color>
     <color name="icons">#A4A4A4</color>
     <color name="subtitle">#CECECE</color>
-    <color name="note_default">#333333</color>
+    <color name="note_default">#ECEFF1</color>
     <color name="note_subtitle">#FAFAFA</color>
     <color name="miscellaneousBackground">#1F1F1F</color>
-    <color name="note_color2">#FDBE3B</color>
-    <color name="note_color3">#FF4842</color>
-    <color name="note_color4">#3A52FC</color>
-    <color name="note_color5">#000000</color>
+    <color name="note_color2">#80deea</color>
+    <color name="note_color3">#ffd54f</color>
+    <color name="note_color4">#aed581</color>
+    <color name="note_color5">#333333</color>
     <color name="delete">#FF4842</color>
     <color name="search_background">#333333</color>
 </resources>

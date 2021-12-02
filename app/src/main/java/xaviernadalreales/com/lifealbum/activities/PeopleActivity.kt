@@ -41,7 +41,22 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
         setUpBottomNav()
         activitiesResults()
         setUpAddProfileButton()
+        searchProfiles()
+        setUpRecyclerView()
+        
+        getProfiles("SHOW", false)
+    }
 
+    private fun setUpRecyclerView() {
+        recyclerViewProfiles = findViewById(R.id.recyclerViewProfiles)
+        recyclerViewProfiles.layoutManager =
+            StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
+
+        peopleAdapter = PeopleAdapter(peopleList, this)
+        recyclerViewProfiles.adapter = peopleAdapter
+    }
+
+    private fun searchProfiles() {
         val inputSearch: EditText = findViewById(R.id.input_search)
         inputSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -57,18 +72,7 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
                 peopleAdapter.cancelTimer()
             }
         })
-    
-
-        recyclerViewProfiles = findViewById(R.id.recyclerViewProfiles)
-        recyclerViewProfiles.layoutManager =
-            StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
-
-        peopleAdapter = PeopleAdapter(peopleList, this)
-        recyclerViewProfiles.adapter = peopleAdapter
-
-        getProfiles("SHOW", false)
     }
-
 
     private fun setUpAddProfileButton() {
         val buttonAddProfile = findViewById<ExtendedFloatingActionButton>(R.id.add_profile_fab)
@@ -160,8 +164,6 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
 
     override fun onElementClicked(element: Person, position: Int) {
         profileClickedPosition = position
-        //TODO: EXPAND FIRST????
-        /// TODO: yes, this below another function
         val intent = Intent(applicationContext, CreateProfileActivity::class.java)
         intent.putExtra("REQUEST_CODE", "UPDATE")
         intent.putExtra("viewOrUpdate", true)

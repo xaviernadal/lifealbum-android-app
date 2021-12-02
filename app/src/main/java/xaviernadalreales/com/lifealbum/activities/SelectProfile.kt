@@ -74,8 +74,6 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
 
     override fun onElementClicked(element: Person, position: Int) {
         profileClickedPosition = position
-        //TODO: EXPAND FIRST????
-        /// TODO: yes, this below another function
         val intent = Intent()
         intent.putExtra("SELECT_PROFILE", element)
         setResult(RESULT_OK, intent)

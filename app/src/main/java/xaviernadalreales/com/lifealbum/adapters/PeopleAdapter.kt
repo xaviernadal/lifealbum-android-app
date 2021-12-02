@@ -23,7 +23,7 @@ import kotlin.concurrent.timerTask
 class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.PeopleViewHolder> {
     private var people: List<Person>
     private var peopleListener: GenericListener<Person>
-    private lateinit var timer: Timer
+    private var timer: Timer? = null
     private var totalPeople: List<Person>
 
     constructor(people: List<Person>, peopleListener: GenericListener<Person>) {
@@ -77,7 +77,7 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.PeopleViewHolder> {
     @SuppressLint("NotifyDataSetChanged")
     fun search(keyword: String) {
         timer = Timer()
-        timer.schedule(
+        timer!!.schedule(
             timerTask
             {
                 if (keyword.trim().isEmpty()) {
@@ -101,7 +101,7 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.PeopleViewHolder> {
     }
 
     fun cancelTimer() {
-        timer.cancel()
+        timer?.cancel()
     }
 
 }

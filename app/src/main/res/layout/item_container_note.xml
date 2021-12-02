@@ -39,7 +39,7 @@
         android:layout_marginBottom="5dp"
         android:fontFamily="@font/montserrat_bold"
         android:includeFontPadding="false"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="15sp" />
 
     <TextView
@@ -51,7 +51,7 @@
         android:layout_marginBottom="8dp"
         android:fontFamily="@font/montserrat_light"
         android:includeFontPadding="false"
-        android:textColor="@color/note_subtitle"
+        android:textColor="@color/black"
         android:textSize="7sp" />
     <TextView
         android:id="@+id/textNote"
@@ -62,7 +62,7 @@
         android:layout_marginBottom="8dp"
         android:fontFamily="@font/montserrat_regular"
         android:includeFontPadding="false"
-        android:textColor="@color/note_subtitle"
+        android:textColor="@color/black"
         android:textSize="11sp" />
 
 
