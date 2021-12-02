@@ -107,6 +107,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
         peopleAdapter = PeopleAdapter(peopleList, this)
         recyclerViewProfiles.adapter = peopleAdapter
+        recyclerViewProfiles.isNestedScrollingEnabled = false
     }
 
     @SuppressLint("NotifyDataSetChanged")

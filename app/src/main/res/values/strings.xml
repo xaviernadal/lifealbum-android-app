@@ -22,4 +22,9 @@
     <string name="delete">Delete</string>
     <string name="name">Name</string>
     <string name="description">Description</string>
+    <string name="people_in_this_note">People in this note:</string>
+    <string name="note">Note</string>
+    <string name="profile">Profile</string>
+    <string name="this_profile_is_in_these_notes">This profile is in these notes:</string>
+    <string name="save">SAVE</string>
 </resources>
