@@ -194,7 +194,6 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                                 peopleAdapter.notifyItemInserted(0)
                                 recyclerViewProfiles.smoothScrollToPosition(0)
                             }
-
                         }
                     }
                 }

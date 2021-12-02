@@ -27,4 +27,7 @@
     <string name="profile">Profile</string>
     <string name="this_profile_is_in_these_notes">This profile is in these notes:</string>
     <string name="save">SAVE</string>
+    <string name="layout">Layout</string>
+    <string name="layout_">Layout:</string>
+    <string name="select_layout">Select layout:</string>
 </resources>

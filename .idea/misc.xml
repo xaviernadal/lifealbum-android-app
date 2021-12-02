@@ -31,10 +31,11 @@
         <entry key="app/src/main/res/layout-v31/item_container_note.xml" value="0.1765625" />
         <entry key="app/src/main/res/layout/activity_create_note.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_create_profile.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_header.xml" value="0.16018518518518518" />
         <entry key="app/src/main/res/layout/fragment_profiles_in_note.xml" value="0.35572916666666665" />
-        <entry key="app/src/main/res/layout/item_container_note.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/item_container_note.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/item_container_note_line.xml" value="0.35572916666666665" />
         <entry key="app/src/main/res/layout/layout_colors.xml" value="0.17597765363128492" />
         <entry key="app/src/main/res/layout/layout_delete_note.xml" value="0.2388888888888889" />
         <entry key="app/src/main/res/layout/layout_delete_profile.xml" value="0.2760416666666667" />

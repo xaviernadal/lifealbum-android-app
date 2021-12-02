@@ -99,7 +99,6 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
                     }
                 }
             }
-
         }
     }
 }

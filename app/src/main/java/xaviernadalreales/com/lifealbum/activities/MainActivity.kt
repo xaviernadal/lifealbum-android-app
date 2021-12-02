@@ -10,7 +10,9 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.RecyclerView
@@ -44,7 +46,9 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
 
         activitiesResult()
         setUpBottomNavigation()
-        setUpRecyclerVew()
+        recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
+        setUpRecyclerView()
+        recyclerViewListener()
         searchNotes()
 
 
@@ -88,13 +92,34 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
         }
     }
 
-    private fun setUpRecyclerVew() {
-        recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
+    private fun setUpRecyclerView() {
+
         recyclerViewNotes.layoutManager =
             StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         notesAdapter = NotesAdapter(noteList, this)
         recyclerViewNotes.adapter = notesAdapter
+    }
+
+    private fun recyclerViewListener() {
+        val imageColumns: ImageView = findViewById(R.id.imageLayoutColumns)
+        val imageRows: ImageView = findViewById(R.id.imageLayoutRows)
+        imageColumns.setOnClickListener {
+            recyclerViewNotes.layoutManager =
+                StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
+
+            notesAdapter = NotesAdapter(noteList, this, displayLineChange = true)
+            recyclerViewNotes.adapter = notesAdapter
+            imageColumns.visibility = View.GONE
+            imageRows.visibility = View.VISIBLE
+        }
+        imageRows.setOnClickListener {
+            setUpRecyclerView()
+            imageRows.visibility = View.GONE
+            imageColumns.visibility = View.VISIBLE
+        }
+
+
     }
 
     private fun searchNotes() {

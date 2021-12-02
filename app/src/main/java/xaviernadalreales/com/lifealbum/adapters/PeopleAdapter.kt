@@ -34,11 +34,9 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.PeopleViewHolder> {
 
     class PeopleViewHolder(@NonNull itemView: View) : RecyclerView.ViewHolder(itemView) {
         var nameProfile: TextView = itemView.findViewById(R.id.profileName)
-        var numberNotes: TextView = itemView.findViewById(R.id.profileNumberNotes)
         var imageProfile: ImageView = itemView.findViewById(R.id.profileImage)
         var layoutProfile: LinearLayout = itemView.findViewById(R.id.layoutProfile)
         fun setPerson(person: Person) {
-            Log.d("SETPERSON", person.name)
             nameProfile.text = person.name
 
             if (person.profilePicture != "") {

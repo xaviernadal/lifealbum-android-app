@@ -76,9 +76,9 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
 
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
         recyclerViewNotes.layoutManager =
-            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
 
-        notesAdapter = NotesAdapter(notesList, this)
+        notesAdapter = NotesAdapter(notesList, this, true)
         recyclerViewNotes.adapter = notesAdapter
 
 

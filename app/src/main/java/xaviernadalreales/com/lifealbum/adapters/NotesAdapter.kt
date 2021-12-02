@@ -7,6 +7,8 @@ import android.graphics.Color.parseColor
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +16,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.NonNull
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import xaviernadalreales.com.lifealbum.R
 import xaviernadalreales.com.lifealbum.entities.Note
@@ -25,22 +28,36 @@ import kotlin.concurrent.timerTask
 
 class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
+    private var displayLine: Boolean
     private var notes: List<Note>
     private var notesListener: GenericListener<Note>
     private var timer: Timer? = null
     private var totalNotes: List<Note>
 
-    constructor(notes: List<Note>, notesListener: GenericListener<Note>) {
+    companion object {
+        var displayLine: Boolean = false
+    }
+
+    constructor(
+        notes: List<Note>,
+        notesListener: GenericListener<Note>,
+        displayLineChange: Boolean = false
+    ) {
         this.notes = notes
         this.notesListener = notesListener
         totalNotes = notes
+        displayLine = displayLineChange
     }
 
     class NoteViewHolder(@NonNull itemView: View) : RecyclerView.ViewHolder(itemView) {
         var textTitle: TextView = itemView.findViewById(R.id.textTitle)
         var textDate: TextView = itemView.findViewById(R.id.textDate)
         var textNote: TextView = itemView.findViewById(R.id.textNote)
-        var layoutNote: LinearLayout = itemView.findViewById(R.id.layoutNote)
+        var layoutNote = if (displayLine) {
+            itemView.findViewById<ConstraintLayout>(R.id.layoutNote)
+        } else {
+            itemView.findViewById<LinearLayout>(R.id.layoutNote)
+        }
         var imageNote: ImageView = itemView.findViewById(R.id.imageNote)
 
         fun setNote(note: Note) {
@@ -54,8 +71,7 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
             if (note.colorNote != "") {
                 gradientDrawable.setColor(parseColor(note.colorNote))
             } else {
-                //TODO: Also change this default color haha
-                gradientDrawable.setColor(parseColor("#333333"))
+                gradientDrawable.setColor(parseColor("#ECEFF1"))
             }
 
             if (note.imagePath != "") {
@@ -68,11 +84,19 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
+        if (displayLine) {
+            return NoteViewHolder(
+                LayoutInflater.from(parent.context).inflate(
+                    R.layout.item_container_note_line, parent, false
+                )
+            )
+        }
         return NoteViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.item_container_note, parent, false
             )
         )
+
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
