@@ -39,7 +39,6 @@ import xaviernadalreales.com.lifealbum.listeners.GenericListener
 import java.io.InputStream
 import java.util.concurrent.Executors
 
-
 class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
     private lateinit var inputNoteTitle: EditText
