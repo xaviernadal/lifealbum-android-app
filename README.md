@@ -5,6 +5,12 @@ forget about. In life album, you can also add profiles of people you have met an
 experiences with, and add them to those notes. Then, the profiles will be shown inside the note, and
 the notes including a profile will also be seen from inside the profiles.
 
+
+## Youtube demo
+
+https://youtu.be/gmJm0Cy0rAk
+
+
 ## MoSCoW requirements
 
 ### Must have
