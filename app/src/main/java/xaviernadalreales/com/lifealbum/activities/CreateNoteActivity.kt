@@ -27,6 +27,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -36,6 +37,8 @@ import xaviernadalreales.com.lifealbum.database.NotesDatabase
 import xaviernadalreales.com.lifealbum.database.PeopleDatabase
 import xaviernadalreales.com.lifealbum.entities.Person
 import xaviernadalreales.com.lifealbum.listeners.GenericListener
+import xaviernadalreales.com.lifealbum.viewModel.NoteViewModel
+import xaviernadalreales.com.lifealbum.viewModel.PersonViewModel
 import java.io.InputStream
 import java.util.concurrent.Executors
 
@@ -66,9 +69,22 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
 
     lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
+    private lateinit var personViewModel: PersonViewModel
+    private lateinit var noteViewModel: NoteViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_note)
+        noteViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(
+            NoteViewModel::class.java
+        )
+        personViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(PersonViewModel::class.java)
 
         setUpBackButton()
         activitiesResults()
@@ -123,7 +139,6 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
             }
     }
 
-
     private fun setUpNoteContent() {
         inputNoteTitle = findViewById(R.id.noteTitle)
         inputNoteText = findViewById(R.id.note)
@@ -154,8 +169,7 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
             val executor = Executors.newSingleThreadExecutor()
             val handler = Handler(Looper.getMainLooper())
             executor.execute {
-                val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()
-                    ?.getAllPeople()
+                val people = personViewModel.getPeople().value
                 val validPeople: MutableList<Person> = mutableListOf()
                 handler.post {
                     when (requestCode) {
@@ -265,7 +279,11 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
         val handler = Handler(Looper.getMainLooper())
 
         executor.execute {
+            noteViewModel.insertNote(note)
+            /*
             NotesDatabase.getDatabase(applicationContext)?.noteDao()?.insertNote(note)
+
+             */
             handler.post {
                 val intent = Intent(applicationContext, MainActivity::class.java)
                 intent.putExtra("REQUEST_CODE", RETURNCODE)
@@ -402,8 +420,13 @@ class CreateNoteActivity : AppCompatActivity(), GenericListener<Person> {
                 val handler = Handler(Looper.getMainLooper())
 
                 executor.execute {
-                    NotesDatabase.getDatabase(applicationContext)?.noteDao()
-                        ?.deleteNote(alreadyAvailableNote)
+                    /*
+                    alreadyAvailableNote?.let { it1 ->
+                        NotesDatabase.getDatabase(applicationContext)?.noteDao()
+                            ?.deleteNote(it1)
+                    }
+                    */
+                    alreadyAvailableNote?.let { it1 -> noteViewModel.deleteNote(it1) }
                 }
                 handler.post {
                     deleteNoteDialog?.dismiss()

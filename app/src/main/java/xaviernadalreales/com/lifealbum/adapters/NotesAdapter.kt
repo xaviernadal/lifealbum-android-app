@@ -32,7 +32,7 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
     private var notes: List<Note>
     private var notesListener: GenericListener<Note>
     private var timer: Timer? = null
-    private var totalNotes: List<Note>
+    private var totalNotes: ArrayList<Note>
 
     companion object {
         var displayLine: Boolean = false
@@ -45,7 +45,7 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
     ) {
         this.notes = notes
         this.notesListener = notesListener
-        totalNotes = notes
+        totalNotes = notes as ArrayList<Note>
         displayLine = displayLineChange
     }
 
@@ -143,6 +143,18 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
             500,
         )
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(newList: List<Note>) {
+
+        totalNotes.clear()
+
+        totalNotes.addAll(newList)
+
+        notifyDataSetChanged()
+    }
+
+
 
     fun cancelTimer() {
         timer?.cancel()

@@ -24,6 +24,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -36,6 +37,8 @@ import xaviernadalreales.com.lifealbum.database.PeopleDatabase
 import xaviernadalreales.com.lifealbum.entities.Note
 import xaviernadalreales.com.lifealbum.entities.Person
 import xaviernadalreales.com.lifealbum.listeners.GenericListener
+import xaviernadalreales.com.lifealbum.viewModel.NoteViewModel
+import xaviernadalreales.com.lifealbum.viewModel.PersonViewModel
 import java.io.InputStream
 import java.util.concurrent.Executors
 
@@ -61,6 +64,8 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
     private var alreadyAvailableProfile: Person? = null
 
     lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var noteViewModel: NoteViewModel
+    private lateinit var personViewModel: PersonViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +85,19 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
 
         notesAdapter = NotesAdapter(notesList, this, true)
         recyclerViewNotes.adapter = notesAdapter
+
+        noteViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(
+            NoteViewModel::class.java
+        )
+        personViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(
+            PersonViewModel::class.java
+        )
 
 
 
@@ -122,8 +140,12 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
                 val handler = Handler(Looper.getMainLooper())
 
                 executor.execute {
-                    PeopleDatabase.getDatabase(applicationContext)?.personDao()
+                    alreadyAvailableProfile?.let { it1 -> personViewModel.deletePerson(it1) }
+
+                    /* PeopleDatabase.getDatabase(applicationContext)?.personDao()
                         ?.deletePerson(alreadyAvailableProfile!!)
+
+                     */
                 }
                 handler.post {
                     deleteProfileDialog?.dismiss()
@@ -147,8 +169,7 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
-            val notes = NotesDatabase.getDatabase(applicationContext)?.noteDao()
-                ?.getAllNotes()
+            val notes = noteViewModel.getNotes().value
             handler.post {
                 if (notes != null) {
                     for (note in notes) {
@@ -232,8 +253,12 @@ class CreateProfileActivity : AppCompatActivity(), GenericListener<Note> {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
+            personViewModel.insertPerson(profile)
+            /*
             PeopleDatabase.getDatabase(applicationContext)?.personDao()
                 ?.insertPerson(profile)
+
+             */
         }
         handler.post {
             val intent = Intent(applicationContext, PeopleActivity::class.java)

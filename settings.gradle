@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Life Album"
 include ':app'
+include ':test'

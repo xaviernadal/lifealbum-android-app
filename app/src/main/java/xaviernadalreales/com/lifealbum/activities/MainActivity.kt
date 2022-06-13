@@ -13,8 +13,11 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -23,6 +26,7 @@ import xaviernadalreales.com.lifealbum.adapters.NotesAdapter
 import xaviernadalreales.com.lifealbum.database.NotesDatabase
 import xaviernadalreales.com.lifealbum.entities.Note
 import xaviernadalreales.com.lifealbum.listeners.GenericListener
+import xaviernadalreales.com.lifealbum.viewModel.NoteViewModel
 import java.util.concurrent.Executors
 
 
@@ -31,7 +35,7 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
     private lateinit var recyclerViewNotes: RecyclerView
     private var noteList: MutableList<Note> = mutableListOf()
     private lateinit var notesAdapter: NotesAdapter
-
+    lateinit var viewModel: NoteViewModel
     private var noteClickedPosition = -1
 
     companion object {
@@ -51,6 +55,7 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
         recyclerViewListener()
         searchNotes()
 
+        initViewModel()
 
         getNotes("SHOW", false)
     }
@@ -93,7 +98,6 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
     }
 
     private fun setUpRecyclerView() {
-
         recyclerViewNotes.layoutManager =
             StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
@@ -118,8 +122,6 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
             imageRows.visibility = View.GONE
             imageColumns.visibility = View.VISIBLE
         }
-
-
     }
 
     private fun searchNotes() {
@@ -141,36 +143,40 @@ class MainActivity : AppCompatActivity(), GenericListener<Note> {
         })
     }
 
+    private fun initViewModel() {
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(NoteViewModel::class.java)
+        viewModel.allNotes.observe(this, Observer { list ->
+            list.let {
+                notesAdapter.updateList(noteList)
+            }
+        })
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     fun getNotes(requestCode: String, noteDeleted: Boolean) {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
-            val notes = NotesDatabase.getDatabase(applicationContext)?.noteDao()?.getAllNotes()
-
+            val notes = viewModel.getNotes()
+            //LiveData notes
             handler.post {
                 when (requestCode) {
-                    "SHOW" ->
-                        if (notes != null) {
-                            noteList.addAll(notes)
-                            notesAdapter.notifyDataSetChanged()
-                        }
                     "ADD_NOTE" -> {
-                        noteList.add(0, notes?.get(0)!!)
-                        notesAdapter.notifyItemInserted(0)
+                        notes.value?.let { notesAdapter.updateList(it) }
                         recyclerViewNotes.smoothScrollToPosition(0)
                     }
                     "UPDATE" -> {
-                        noteList.removeAt(noteClickedPosition)
+                        val note = viewModel.getNotes().value?.get(noteClickedPosition)!!
                         if (noteDeleted) {
-                            notesAdapter.notifyItemRemoved(noteClickedPosition)
+                            viewModel.deleteNote(note)
+                            Toast.makeText(this, "Note Deleted", Toast.LENGTH_LONG).show()
                         } else {
-                            if (notes != null) {
-                                noteList.add(noteClickedPosition, notes[noteClickedPosition])
-                                notesAdapter.notifyItemChanged(noteClickedPosition)
-                            }
+                            viewModel.insertNote(note)
                         }
+                        recyclerViewNotes.smoothScrollToPosition(0)
                     }
                 }
             }

@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -19,6 +20,7 @@ import xaviernadalreales.com.lifealbum.database.NotesDatabase
 import xaviernadalreales.com.lifealbum.database.PeopleDatabase
 import xaviernadalreales.com.lifealbum.entities.Person
 import xaviernadalreales.com.lifealbum.listeners.GenericListener
+import xaviernadalreales.com.lifealbum.viewModel.PersonViewModel
 import java.util.concurrent.Executors
 
 class SelectProfile : AppCompatActivity(), GenericListener<Person> {
@@ -28,6 +30,7 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
 
     private var profileClickedPosition = -1
     lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var personViewModel: PersonViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +46,11 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
 
         peopleAdapter = PeopleAdapter(peopleList, this)
         recyclerViewProfiles.adapter = peopleAdapter
+
+        personViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(PersonViewModel::class.java)
 
         getProfiles(false)
     }
@@ -85,7 +93,7 @@ class SelectProfile : AppCompatActivity(), GenericListener<Person> {
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
-            val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()?.getAllPeople()
+            val people = personViewModel.getPeople().value
             handler.post {
                 if (people != null) {
                     if (added) {

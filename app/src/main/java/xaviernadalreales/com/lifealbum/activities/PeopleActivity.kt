@@ -13,6 +13,7 @@ import android.widget.EditText
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -22,6 +23,7 @@ import xaviernadalreales.com.lifealbum.adapters.PeopleAdapter
 import xaviernadalreales.com.lifealbum.database.PeopleDatabase
 import xaviernadalreales.com.lifealbum.entities.Person
 import xaviernadalreales.com.lifealbum.listeners.GenericListener
+import xaviernadalreales.com.lifealbum.viewModel.PersonViewModel
 import java.util.concurrent.Executors
 
 class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
@@ -33,6 +35,7 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
     private var profileClickedPosition = -1
 
     lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var personViewModel: PersonViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +46,12 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
         setUpAddProfileButton()
         searchProfiles()
         setUpRecyclerView()
-        
+
+        personViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(PersonViewModel::class.java)
+
         getProfiles("SHOW", false)
     }
 
@@ -128,7 +136,8 @@ class PeopleActivity : AppCompatActivity(), GenericListener<Person> {
         val handler = Handler(Looper.getMainLooper())
         executor.execute {
 
-            val people = PeopleDatabase.getDatabase(applicationContext)?.personDao()?.getAllPeople()
+            val people = personViewModel.getPeople().value
+
             Log.d("AAAAAAAAA", people.toString())
             handler.post {
                 Log.d("A", "a2")
